@@ -366,6 +366,14 @@ class Adapter extends AbstractAdapter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function applyPathPrefix($prefix)
+    {
+        return ltrim(parent::applyPathPrefix($prefix), '/');
+    }
+
+    /**
      * Upload an object.
      *
      * @param        $path
@@ -426,14 +434,6 @@ class Adapter extends AbstractAdapter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function applyPathPrefix($prefix)
-    {
-        return ltrim(parent::applyPathPrefix($prefix), '/');
-    }
-
-    /**
      * Normalize the object result array.
      *
      * @param array $response
@@ -454,6 +454,6 @@ class Adapter extends AbstractAdapter
             return $result;
         }
 
-        return array_merge($result, Util::map($response, static::$resultMap), array('type' => 'file'));
+        return array_merge($result, Util::map($response, static::$resultMap), ['type' => 'file']);
     }
 }
