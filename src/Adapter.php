@@ -2,6 +2,8 @@
 
 namespace League\Flysystem\AwsS3v3;
 
+use Aws\S3\ClearBucket;
+use Aws\S3\Exception\ClearBucketException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Aws\Common\Result;
@@ -135,7 +137,22 @@ class Adapter extends AbstractAdapter
      */
     public function deleteDir($dirname)
     {
-        // TODO: implement deleteDir
+        $iterator = $this->s3Client->getIterator('ListObjects', [
+            'Bucket' => $this->bucket,
+            'Prefix' => ltrim($this->applyPathPrefix($dirname) . '/', '/'),
+        ]);
+
+        $clearBucket = new ClearBucket($this->s3Client, $this->bucket, [
+            'iterator' => $iterator,
+        ]);
+
+        try {
+            $clearBucket->clear();
+        } catch (ClearBucketException $exception) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -189,9 +206,10 @@ class Adapter extends AbstractAdapter
     public function listContents($directory = '', $recursive = false)
     {
         $prefix = $this->applyPathPrefix(rtrim($directory, '/') . '/');
+
         $command = $this->s3Client->getCommand('listObjects', [
             'Bucket' => $this->bucket,
-            'Prefix' => $prefix
+            'Prefix' => ltrim($prefix, '/'),
         ]);
 
         /** @var Result $result */

@@ -193,9 +193,54 @@ class AdapterSpec extends ObjectBehavior
         $this->listContents($prefix)->shouldHaveCount(2);
     }
 
-    public function it_should_delete_directories()
+    public function it_should_delete_directories(CommandInterface $command)
     {
+        $iterator = new \ArrayIterator($batch = [
+            ['Key' => 'key.txt'],
+        ]);
 
+        $this->client->getIterator('ListObjects', [
+            'Bucket' => $this->bucket,
+            'Prefix' => 'prefix/',
+        ])->willReturn($iterator);
+
+        $this->client->getCommand('DeleteObjects', [
+            'Bucket' => $this->bucket,
+            'Delete' => [
+                'Objects' => $batch
+            ]
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willReturn(new Result([
+            'Errors' => [],
+        ]));
+
+        $this->deleteDir('prefix')->shouldBe(true);
+    }
+
+    public function it_should_return_false_when_deleting_a_directory_fails(CommandInterface $command)
+    {
+        $iterator = new \ArrayIterator($batch = [
+            ['Key' => 'key.txt'],
+        ]);
+
+        $this->client->getIterator('ListObjects', [
+            'Bucket' => $this->bucket,
+            'Prefix' => 'prefix/',
+        ])->willReturn($iterator);
+
+        $this->client->getCommand('DeleteObjects', [
+            'Bucket' => $this->bucket,
+            'Delete' => [
+                'Objects' => $batch
+            ]
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willReturn(new Result([
+            'Errors' => ['Error'],
+        ]));
+
+        $this->deleteDir('prefix')->shouldBe(false);
     }
 
     public function it_should_get_the_visibility_of_a_public_file(CommandInterface $aclCommand)
