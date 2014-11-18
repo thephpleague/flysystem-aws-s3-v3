@@ -3,10 +3,10 @@
 namespace spec\League\Flysystem\AwsS3v3;
 
 use Aws\Common\Result;
-use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use GuzzleHttp\Command\CommandInterface;
 use GuzzleHttp\Stream\Stream;
+use League\Flysystem\AwsS3v3\Adapter;
 use League\Flysystem\Config;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -115,27 +115,21 @@ class AdapterSpec extends ObjectBehavior
         $this->make_it_retrieve_file_metadata('has', $command);
     }
 
-    public function it_should_copy_files(CommandInterface $command)
+    public function it_should_copy_files(CommandInterface $command, CommandInterface $aclCommand)
     {
-        $this->client->getCommand('copyObject', [
-            'Bucket' => $this->bucket,
-            'Key' => $key = 'key.txt',
-            'CopySource' => $this->bucket . '/' . ($sourceKey = 'newkey.txt'),
-        ])->willReturn($command);
-
-        $this->client->execute($command)->shouldBeCalled();
+        $key = 'key.txt';
+        $sourceKey = 'newkey.txt';
+        $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
+        $this->make_it_copy_successfully($command, $key, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(true);
     }
 
-    public function it_should_return_false_when_copy_fails(CommandInterface $command)
+    public function it_should_return_false_when_copy_fails(CommandInterface $command, CommandInterface $aclCommand)
     {
-        $this->client->getCommand('copyObject', [
-            'Bucket' => $this->bucket,
-            'Key' => $key = 'key.txt',
-            'CopySource' => $this->bucket . '/' . ($sourceKey = 'newkey.txt'),
-        ])->willReturn($command);
-
-        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
+        $key = 'key.txt';
+        $sourceKey = 'newkey.txt';
+        $this->make_it_fail_on_copy($command, $key, $sourceKey);
+        $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(false);
     }
 
@@ -153,36 +147,27 @@ class AdapterSpec extends ObjectBehavior
 
         $this->createDir($path, $config)->shouldBeArray();
     }
-    public function it_should_return_false_during_rename_when_copy_fails(CommandInterface $command)
-    {
-        $this->client->getCommand('copyObject', [
-            'Bucket' => $this->bucket,
-            'Key' => $key = 'key.txt',
-            'CopySource' => $this->bucket . '/' . ($sourceKey = 'newkey.txt'),
-        ])->willReturn($command);
 
-        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
+    public function it_should_return_false_during_rename_when_copy_fails(CommandInterface $command, CommandInterface $aclCommand)
+    {
+        $key = 'key.txt';
+        $sourceKey = 'newkey.txt';
+        $this->make_it_fail_on_copy($command, $key, $sourceKey);
+        $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->rename($sourceKey, $key)->shouldBe(false);
     }
 
-    public function it_should_copy_and_delete_during_renames(CommandInterface $copyCommand, CommandInterface $deleteCommand)
-    {
-        $this->client->getCommand('copyObject', [
-            'Bucket' => $this->bucket,
-            'Key' => $key = 'key.txt',
-            'CopySource' => $this->bucket . '/' . ($sourceKey = 'newkey.txt'),
-        ])->willReturn($copyCommand);
+    public function it_should_copy_and_delete_during_renames(
+        CommandInterface $copyCommand,
+        CommandInterface $deleteCommand,
+        CommandInterface $aclCommand
+    ) {
+        $sourceKey = 'newkey.txt';
+        $key = 'key.txt';
 
-        $this->client->execute($copyCommand)->shouldBeCalled();
-
-        $deleteResult = new Result(['DeleteMarker' => true]);
-
-        $this->client->getCommand('deleteObject', [
-            'Bucket' => $this->bucket,
-            'Key' => $sourceKey,
-        ])->willReturn($deleteCommand);
-
-        $this->client->execute($deleteCommand)->willReturn($deleteResult);
+        $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
+        $this->make_it_copy_successfully($copyCommand, $key, $sourceKey, 'private');
+        $this->make_it_delete_successfully($deleteCommand, $sourceKey);
 
         $this->rename($sourceKey, $key)->shouldBe(true);
     }
@@ -213,17 +198,86 @@ class AdapterSpec extends ObjectBehavior
 
     }
 
-    public function it_should_get_the_visibility_of_a_file()
+    public function it_should_get_the_visibility_of_a_public_file(CommandInterface $aclCommand)
     {
-
+        $key = 'key.txt';
+        $this->make_it_retrieve_raw_visibility($aclCommand, $key, 'public');
+        $this->getVisibility($key)->shouldHaveKey('visibility');
+        $this->getVisibility($key)->shouldHaveValue('public');
     }
 
-    public function it_should_set_the_visibility_of_a_file()
+    public function it_should_get_the_visibility_of_a_private_file(CommandInterface $aclCommand)
     {
-
+        $key = 'key.txt';
+        $this->make_it_retrieve_raw_visibility($aclCommand, $key, 'private');
+        $this->getVisibility($key)->shouldHaveKey('visibility');
+        $this->getVisibility($key)->shouldHaveValue('private');
     }
 
-    protected function make_it_retrieve_file_metadata($method, CommandInterface $command)
+    public function it_should_set_the_visibility_of_a_file_to_public(CommandInterface $command)
+    {
+        $this->client->getCommand('putObjectAcl', [
+            'Bucket' => $this->bucket,
+            'Key' => $key = 'key.txt',
+            'ACL' => 'public-read',
+        ])->willReturn($command);
+
+        $this->client->execute($command)->shouldBeCalled();
+
+        $this->setVisibility($key, 'public')->shouldHaveValue('public');
+    }
+
+    public function it_should_set_the_visibility_of_a_file_to_private(CommandInterface $command)
+    {
+        $this->client->getCommand('putObjectAcl', [
+            'Bucket' => $this->bucket,
+            'Key' => $key = 'key.txt',
+            'ACL' => 'private',
+        ])->willReturn($command);
+
+        $this->client->execute($command)->shouldBeCalled();
+
+        $this->setVisibility($key, 'private')->shouldHaveValue('private');
+    }
+
+    public function it_should_return_false_when_failing_to_set_visibility(CommandInterface $command)
+    {
+        $this->client->getCommand('putObjectAcl', [
+            'Bucket' => $this->bucket,
+            'Key' => $key = 'key.txt',
+            'ACL' => 'private',
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
+
+        $this->setVisibility($key, 'private')->shouldBe(false);
+    }
+
+    private function make_it_retrieve_raw_visibility(CommandInterface $command, $key, $visibility)
+    {
+        $options = [
+            'private' => [
+                'Grants' => [],
+            ],
+            'public' => [
+                'Grants' => [[
+                    'Grantee' => ['URI' => Adapter::PUBLIC_GRANT_URI],
+                    'Permission' => 'READ',
+                ]]
+            ]
+        ];
+
+        $result = new Result($options[$visibility]);
+
+        $this->client->getCommand('getObjectAcl', [
+            'Bucket' => $this->bucket,
+            'Key' => $key,
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willReturn($result);
+    }
+
+    private function make_it_retrieve_file_metadata($method, CommandInterface $command)
     {
         $timestamp = time();
 
@@ -242,7 +296,7 @@ class AdapterSpec extends ObjectBehavior
         $this->{$method}($key)->shouldBeArray();
     }
 
-    protected function make_it_read_a_file(CommandInterface $command, $method, $contents)
+    private function make_it_read_a_file(CommandInterface $command, $method, $contents)
     {
         $key = 'key.txt';
         $stream = Stream::factory($contents);
@@ -260,7 +314,7 @@ class AdapterSpec extends ObjectBehavior
         $this->{$method}($key)->shouldBeArray();
     }
 
-    protected function make_it_write_using($method, $body)
+    private function make_it_write_using($method, $body)
     {
         $config = new Config;
         $path = 'key.txt';
@@ -272,5 +326,67 @@ class AdapterSpec extends ObjectBehavior
         )->shouldBeCalled();
 
         $this->{$method}($path, $body, $config)->shouldBeArray();
+    }
+
+    /**
+     * @param CommandInterface $copyCommand
+     * @param                  $key
+     * @param                  $sourceKey
+     */
+    private function make_it_copy_successfully(CommandInterface $copyCommand, $key, $sourceKey, $acl)
+    {
+        $this->client->getCommand('copyObject', [
+            'Bucket'     => $this->bucket,
+            'Key'        => $key,
+            'CopySource' => $this->bucket . '/' . $sourceKey,
+            'ACL'        => $acl,
+        ])->willReturn($copyCommand);
+
+        $this->client->execute($copyCommand)->shouldBeCalled();
+    }
+
+    /**
+     * @param CommandInterface $deleteCommand
+     * @param                  $sourceKey
+     */
+    private function make_it_delete_successfully(CommandInterface $deleteCommand, $sourceKey)
+    {
+        $deleteResult = new Result(['DeleteMarker' => true]);
+
+        $this->client->getCommand('deleteObject', [
+            'Bucket' => $this->bucket,
+            'Key'    => $sourceKey,
+        ])->willReturn($deleteCommand);
+
+        $this->client->execute($deleteCommand)->willReturn($deleteResult);
+    }
+
+    /**
+     * @param CommandInterface $command
+     * @param                  $key
+     * @param                  $sourceKey
+     */
+    private function make_it_fail_on_copy(CommandInterface $command, $key, $sourceKey)
+    {
+        $this->client->getCommand('copyObject', [
+            'Bucket'     => $this->bucket,
+            'Key'        => $key,
+            'CopySource' => $this->bucket . '/' . $sourceKey,
+            'ACL' => 'private',
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
+    }
+
+    public function getMatchers()
+    {
+        return [
+            'haveKey' => function($subject, $key) {
+                return array_key_exists($key, $subject);
+            },
+            'haveValue' => function($subject, $value) {
+                return in_array($value, $subject);
+            },
+        ];
     }
 }

@@ -14,6 +14,8 @@ use League\Flysystem\Util;
 
 class Adapter extends AbstractAdapter
 {
+    const PUBLIC_GRANT_URI = 'http://acs.amazonaws.com/groups/global/AllUsers';
+
     /**
      * @var  array  $resultMap
      */
@@ -55,7 +57,7 @@ class Adapter extends AbstractAdapter
      * @param          $bucket
      * @param string   $prefix
      */
-    public function __construct(S3Client $client, $bucket, $prefix = '/')
+    public function __construct(S3Client $client, $bucket, $prefix = '')
     {
         $this->s3Client = $client;
         $this->bucket = $bucket;
@@ -285,11 +287,13 @@ class Adapter extends AbstractAdapter
      */
     public function copy($path, $newpath)
     {
+        $visibility = $this->getRawVisibility($path);
+
         $command = $this->s3Client->getCommand('copyObject', [
             'Bucket' => $this->bucket,
             'Key' => $this->applyPathPrefix($newpath),
             'CopySource' => $this->bucket . '/' . $this->applyPathPrefix($path),
-            // 'ACL' => $this->getObjectAcl($path), // TODO: get the objects ACL when copying.
+            'ACL' => $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private',
         ]);
 
         try {
@@ -351,7 +355,19 @@ class Adapter extends AbstractAdapter
      */
     public function setVisibility($path, $visibility)
     {
-        // TODO: Implement setVisibility() method.
+        $command = $this->s3Client->getCommand('putObjectAcl', [
+            'Bucket' => $this->bucket,
+            'Key' => $this->applyPathPrefix($path),
+            'ACL' => $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private',
+        ]);
+
+        try {
+            $this->s3Client->execute($command);
+        } catch (S3Exception $exception) {
+            return false;
+        }
+
+        return compact('path', 'visibility');
     }
 
     /**
@@ -362,7 +378,7 @@ class Adapter extends AbstractAdapter
      */
     public function getVisibility($path)
     {
-        // TODO: Implement getVisibility() method.
+        return ['visibility' => $this->getRawVisibility($path)];
     }
 
     /**
@@ -371,6 +387,43 @@ class Adapter extends AbstractAdapter
     public function applyPathPrefix($prefix)
     {
         return ltrim(parent::applyPathPrefix($prefix), '/');
+    }
+
+    public function setPathPrefix($prefix)
+    {
+        $prefix = ltrim($prefix, '/');
+
+        return parent::setPathPrefix($prefix);
+    }
+
+    /**
+     * Get the object acl presented as a visibility
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function getRawVisibility($path)
+    {
+        $command = $this->s3Client->getCommand('getObjectAcl', [
+            'Bucket' => $this->bucket,
+            'Key' => $this->applyPathPrefix($path),
+        ]);
+
+        $result = $this->s3Client->execute($command);
+        $visibility = AdapterInterface::VISIBILITY_PRIVATE;
+
+        foreach ($result->get('Grants') as $grant) {
+            if (
+                isset($grant['Grantee']['URI'])
+                && $grant['Grantee']['URI'] === self::PUBLIC_GRANT_URI
+                && $grant['Permission'] === 'READ'
+            ) {
+                $visibility = AdapterInterface::VISIBILITY_PUBLIC;
+                break;
+            }
+        }
+
+        return $visibility;
     }
 
     /**
