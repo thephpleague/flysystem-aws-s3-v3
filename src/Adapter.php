@@ -2,15 +2,14 @@
 
 namespace League\Flysystem\AwsS3v3;
 
+use Aws\Common\Result;
 use Aws\S3\ClearBucket;
 use Aws\S3\Exception\ClearBucketException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
-use Aws\Common\Result;
-use Aws\S3\Exception\ObjectNotInActiveTierError;
 use GuzzleHttp\Exception\RequestException;
-use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\AdapterInterface;
+use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 
