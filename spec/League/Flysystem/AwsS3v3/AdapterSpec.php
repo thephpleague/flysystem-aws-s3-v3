@@ -361,7 +361,7 @@ class AdapterSpec extends ObjectBehavior
 
     private function make_it_write_using($method, $body)
     {
-        $config = new Config;
+        $config = new Config(['visibility' => 'public', 'mimetype' => 'plain/text', 'CacheControl' => 'value']);
         $path = 'key.txt';
         $this->client->upload(
             $this->bucket,
