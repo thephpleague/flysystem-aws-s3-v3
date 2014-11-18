@@ -456,6 +456,7 @@ class Adapter extends AbstractAdapter
     {
         $key = $this->applyPathPrefix($path);
         $options = $this->getOptionsFromConfig($config);
+        $acl = isset($options['ACL']) ? $options['ACL'] : 'private';
 
         if (! isset($options['ContentType']) && is_string($body)) {
             $options['ContentType'] = Util::guessMimeType($path, $body);
@@ -465,7 +466,7 @@ class Adapter extends AbstractAdapter
             $options['ContentLength'] = is_string($body) ? Util::contentSize($body) : Util::getStreamSize($body);
         }
 
-        $this->s3Client->upload($this->bucket, $key, $body, $options);
+        $this->s3Client->upload($this->bucket, $key, $body, $acl, ['params' => $options]);
 
         return $this->normalizeResponse($options, $key);
     }

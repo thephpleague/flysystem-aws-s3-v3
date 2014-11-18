@@ -142,6 +142,7 @@ class AdapterSpec extends ObjectBehavior
             $this->bucket,
             $path . '/',
             $body,
+            'private',
             Argument::type('array')
         )->shouldBeCalled();
 
@@ -367,6 +368,7 @@ class AdapterSpec extends ObjectBehavior
             $this->bucket,
             $path,
             $body,
+            'public-read',
             Argument::type('array')
         )->shouldBeCalled();
 
