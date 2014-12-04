@@ -7,7 +7,7 @@
         }
     },
     "require": {
-        "league/flysystem": "0.6.*@dev",
+        "league/flysystem": "~1.0@dev",
         "aws/aws-sdk-php": "3.*@dev"
     },
     "require-dev": {
