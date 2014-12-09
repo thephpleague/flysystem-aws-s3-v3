@@ -8,8 +8,8 @@ use Aws\S3\Exception\ClearBucketException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use GuzzleHttp\Exception\RequestException;
-use League\Flysystem\AdapterInterface;
 use League\Flysystem\Adapter\AbstractAdapter;
+use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 
@@ -20,25 +20,25 @@ class Adapter extends AbstractAdapter
     /**
      * @var  array  $resultMap
      */
-    protected static $resultMap = array(
+    protected static $resultMap = [
         'Body'          => 'contents',
         'ContentLength' => 'size',
         'ContentType'   => 'mimetype',
         'Size'          => 'size',
-    );
+    ];
 
     /**
      * @var  array  $metaOptions
      */
-    protected static $metaOptions = array(
+    protected static $metaOptions = [
         'CacheControl',
         'Expires',
         'StorageClass',
         'ServerSideEncryption',
         'Metadata',
         'ACL',
-        'ContentType'
-    );
+        'ContentType',
+    ];
 
     /**
      * @var S3Client
@@ -49,7 +49,6 @@ class Adapter extends AbstractAdapter
      * @var string
      */
     protected $bucket;
-
 
     /**
      * Constructor
@@ -138,7 +137,7 @@ class Adapter extends AbstractAdapter
     {
         $iterator = $this->s3Client->getIterator('ListObjects', [
             'Bucket' => $this->bucket,
-            'Prefix' => ltrim($this->applyPathPrefix($dirname) . '/', '/'),
+            'Prefix' => ltrim($this->applyPathPrefix($dirname).'/', '/'),
         ]);
 
         $clearBucket = new ClearBucket($this->s3Client, $this->bucket, [
@@ -164,7 +163,7 @@ class Adapter extends AbstractAdapter
      */
     public function createDir($dirname, Config $config)
     {
-        return $this->upload($dirname . '/', '', $config);
+        return $this->upload($dirname.'/', '', $config);
     }
 
     /**
@@ -204,7 +203,7 @@ class Adapter extends AbstractAdapter
      */
     public function listContents($directory = '', $recursive = false)
     {
-        $prefix = $this->applyPathPrefix(rtrim($directory, '/') . '/');
+        $prefix = $this->applyPathPrefix(rtrim($directory, '/').'/');
 
         $command = $this->s3Client->getCommand('listObjects', [
             'Bucket' => $this->bucket,
@@ -309,7 +308,7 @@ class Adapter extends AbstractAdapter
         $command = $this->s3Client->getCommand('copyObject', [
             'Bucket' => $this->bucket,
             'Key' => $this->applyPathPrefix($newpath),
-            'CopySource' => $this->bucket . '/' . $this->applyPathPrefix($path),
+            'CopySource' => $this->bucket.'/'.$this->applyPathPrefix($path),
             'ACL' => $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private',
         ]);
 
@@ -512,7 +511,7 @@ class Adapter extends AbstractAdapter
      */
     protected function normalizeResponse(array $response, $path = null)
     {
-        $result = array('path' => $path ?: $this->removePathPrefix($response['Key']));
+        $result = ['path' => $path ?: $this->removePathPrefix($response['Key'])];
 
         if (isset($response['LastModified'])) {
             $result['timestamp'] = strtotime($response['LastModified']);

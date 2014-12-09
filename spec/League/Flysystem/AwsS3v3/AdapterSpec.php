@@ -16,37 +16,37 @@ class AdapterSpec extends ObjectBehavior
     private $client;
     private $bucket;
 
-    function let(S3Client $client)
+    public function let(S3Client $client)
     {
         $this->client = $client;
         $this->bucket = 'bucket';
         $this->beConstructedWith($this->client, $this->bucket);
     }
 
-    function it_is_initializable()
+    public function it_is_initializable()
     {
         $this->shouldHaveType('League\Flysystem\AwsS3v3\Adapter');
         $this->shouldHaveType('League\Flysystem\AdapterInterface');
     }
 
-    function it_should_write_files()
+    public function it_should_write_files()
     {
         $this->make_it_write_using('write', 'contents');
     }
 
-    function it_should_update_files()
+    public function it_should_update_files()
     {
         $this->make_it_write_using('update', 'contents');
     }
 
-    function it_should_write_files_streamed()
+    public function it_should_write_files_streamed()
     {
         $stream = tmpfile();
         $this->make_it_write_using('writeStream', $stream);
         fclose($stream);
     }
 
-    function it_should_update_files_streamed()
+    public function it_should_update_files_streamed()
     {
         $stream = tmpfile();
         $this->make_it_write_using('updateStream', $stream);
@@ -135,12 +135,12 @@ class AdapterSpec extends ObjectBehavior
 
     public function it_should_create_directories()
     {
-        $config = new Config;
+        $config = new Config();
         $path = 'dir/name';
         $body = '';
         $this->client->upload(
             $this->bucket,
-            $path . '/',
+            $path.'/',
             $body,
             'private',
             Argument::type('array')
@@ -179,14 +179,14 @@ class AdapterSpec extends ObjectBehavior
 
         $this->client->getCommand('listObjects', [
             'Bucket' => $this->bucket,
-            'Prefix' => $prefix . '/',
+            'Prefix' => $prefix.'/',
         ])->willReturn($command);
 
         $result = new Result([
             'Contents' => [
                 ['Key' => 'prefix/filekey.txt'],
                 ['Key' => 'prefix/dirname/'],
-            ]
+            ],
         ]);
 
         $this->client->execute($command)->willReturn($result);
@@ -208,7 +208,7 @@ class AdapterSpec extends ObjectBehavior
         $this->client->getCommand('DeleteObjects', [
             'Bucket' => $this->bucket,
             'Delete' => [
-                'Objects' => $batch
+                'Objects' => $batch,
             ]
         ])->willReturn($command);
 
@@ -233,7 +233,7 @@ class AdapterSpec extends ObjectBehavior
         $this->client->getCommand('DeleteObjects', [
             'Bucket' => $this->bucket,
             'Delete' => [
-                'Objects' => $batch
+                'Objects' => $batch,
             ]
         ])->willReturn($command);
 
@@ -309,8 +309,8 @@ class AdapterSpec extends ObjectBehavior
                 'Grants' => [[
                     'Grantee' => ['URI' => Adapter::PUBLIC_GRANT_URI],
                     'Permission' => 'READ',
-                ]]
-            ]
+                ]],
+            ],
         ];
 
         $result = new Result($options[$visibility]);
@@ -385,7 +385,7 @@ class AdapterSpec extends ObjectBehavior
         $this->client->getCommand('copyObject', [
             'Bucket'     => $this->bucket,
             'Key'        => $key,
-            'CopySource' => $this->bucket . '/' . $sourceKey,
+            'CopySource' => $this->bucket.'/'.$sourceKey,
             'ACL'        => $acl,
         ])->willReturn($copyCommand);
 
@@ -418,7 +418,7 @@ class AdapterSpec extends ObjectBehavior
         $this->client->getCommand('copyObject', [
             'Bucket'     => $this->bucket,
             'Key'        => $key,
-            'CopySource' => $this->bucket . '/' . $sourceKey,
+            'CopySource' => $this->bucket.'/'.$sourceKey,
             'ACL' => 'private',
         ])->willReturn($command);
 
@@ -428,10 +428,10 @@ class AdapterSpec extends ObjectBehavior
     public function getMatchers()
     {
         return [
-            'haveKey' => function($subject, $key) {
+            'haveKey' => function ($subject, $key) {
                 return array_key_exists($key, $subject);
             },
-            'haveValue' => function($subject, $value) {
+            'haveValue' => function ($subject, $value) {
                 return in_array($value, $subject);
             },
         ];
