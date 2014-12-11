@@ -1,5 +1,6 @@
-vendor/
-bin/
-coverage/
+.idea
+vendor
+bin
+coverage
 coverage.xml
 composer.lock
