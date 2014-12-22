@@ -334,6 +334,7 @@ class Adapter extends AbstractAdapter
 
         if ($response !== false) {
             $response['stream'] = $response['contents']->detach();
+            rewind($response['stream']);
             unset($response['contents']);
         }
 
