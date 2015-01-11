@@ -6,12 +6,12 @@ use Aws\Common\Result;
 use Aws\S3\S3Client;
 use GuzzleHttp\Command\CommandInterface;
 use GuzzleHttp\Stream\Stream;
-use League\Flysystem\AwsS3v3\Adapter;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-class AdapterSpec extends ObjectBehavior
+class AwsS3AdapterSpec extends ObjectBehavior
 {
     private $client;
     private $bucket;
@@ -25,7 +25,7 @@ class AdapterSpec extends ObjectBehavior
 
     public function it_is_initializable()
     {
-        $this->shouldHaveType('League\Flysystem\AwsS3v3\Adapter');
+        $this->shouldHaveType('League\Flysystem\AwsS3v3\AwsS3Adapter');
         $this->shouldHaveType('League\Flysystem\AdapterInterface');
     }
 
@@ -307,7 +307,7 @@ class AdapterSpec extends ObjectBehavior
             ],
             'public' => [
                 'Grants' => [[
-                    'Grantee' => ['URI' => Adapter::PUBLIC_GRANT_URI],
+                    'Grantee' => ['URI' => AwsS3Adapter::PUBLIC_GRANT_URI],
                     'Permission' => 'READ',
                 ]],
             ],

@@ -13,7 +13,7 @@ use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 
-class Adapter extends AbstractAdapter
+class AwsS3Adapter extends AbstractAdapter
 {
     const PUBLIC_GRANT_URI = 'http://acs.amazonaws.com/groups/global/AllUsers';
 
