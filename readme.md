@@ -12,6 +12,12 @@
 
 This is a Flysystem adapter for the aws-sdk-php v3.
 
+# Installation
+
+```bash
+composer require league/flysystem-aws-s3-v3
+```
+
 # Bootstrap
 
 ``` php
