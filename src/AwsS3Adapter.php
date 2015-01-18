@@ -18,7 +18,7 @@ class AwsS3Adapter extends AbstractAdapter
     const PUBLIC_GRANT_URI = 'http://acs.amazonaws.com/groups/global/AllUsers';
 
     /**
-     * @var  array  $resultMap
+     * @var array
      */
     protected static $resultMap = [
         'Body'          => 'contents',
@@ -28,7 +28,7 @@ class AwsS3Adapter extends AbstractAdapter
     ];
 
     /**
-     * @var  array  $metaOptions
+     * @var array
      */
     protected static $metaOptions = [
         'CacheControl',
