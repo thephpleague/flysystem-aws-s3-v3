@@ -10,8 +10,8 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "league/flysystem": "~1.0@dev",
-        "aws/aws-sdk-php": "~3.0@dev"
+        "league/flysystem": "~1.0@alpha",
+        "aws/aws-sdk-php": "3.*@dev"
     },
     "require-dev": {
         "phpspec/phpspec": "~2.0.0",
