@@ -23,6 +23,16 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->beConstructedWith($this->client, $this->bucket);
     }
 
+    public function it_should_retrieve_the_bucket() 
+    {
+        $this->getBucket()->shouldBe('bucket');
+    }
+
+    public function it_should_retrieve_the_client()
+    {
+        $this->getClient()->shouldBe($this->client);
+    }
+
     public function it_is_initializable()
     {
         $this->shouldHaveType('League\Flysystem\AwsS3v3\AwsS3Adapter');
