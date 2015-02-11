@@ -3,7 +3,7 @@
 namespace spec\League\Flysystem\AwsS3v3;
 
 use Aws\Result;
-use Aws\S3Client;
+use Aws\S3\S3Client;
 use GuzzleHttp\Command\CommandInterface;
 use GuzzleHttp\Stream\Stream;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
