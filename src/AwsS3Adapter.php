@@ -6,7 +6,7 @@ use Aws\Result;
 use Aws\S3\ClearBucket;
 use Aws\S3\Exception\ClearBucketException;
 use Aws\Exception\S3Exception;
-use Aws\S3Client;
+use Aws\S3\S3Client;
 use GuzzleHttp\Exception\RequestException;
 use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\AdapterInterface;
