@@ -294,7 +294,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'ACL' => 'private',
         ])->willReturn($command);
 
-        $this->client->execute($command)->willThrow('Aws\Exception\S3Exception');
+        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
 
         $this->setVisibility($key, 'private')->shouldBe(false);
     }
@@ -422,7 +422,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'ACL' => 'private',
         ])->willReturn($command);
 
-        $this->client->execute($command)->willThrow('Aws\Exception\S3Exception');
+        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
     }
 
     public function getMatchers()
