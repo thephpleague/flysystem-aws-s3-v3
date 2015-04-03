@@ -14,6 +14,8 @@
 
 This adapter is a WIP. The current stable version of the AWS S3 SDK is V2. This adapter will be updated with the latest changes when a stable version of the new (v3) SDK is released.
 
+You're adviced to use v2 until this release: http://github.com/thephpleague/flysystem-aws-s3-v2
+
 This is a Flysystem adapter for the aws-sdk-php v3.
 
 # Installation
