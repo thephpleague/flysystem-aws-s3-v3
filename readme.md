@@ -10,6 +10,10 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/league/flysystem.svg?style=flat-square)](https://packagist.org/packages/league/flysystem)
 -->
 
+# CAUTION
+
+This adapter is a WIP. The current stable version of the AWS S3 SDK is V2. This adapter will be updated with the latest changes when a stable version of the new (v3) SDK is released.
+
 This is a Flysystem adapter for the aws-sdk-php v3.
 
 # Installation
