@@ -80,7 +80,7 @@ class AwsS3Adapter extends AbstractAdapter
      */
     public function getClient()
     {
-        return $this->client;
+        return $this->s3Client;
     }
 
     /**
