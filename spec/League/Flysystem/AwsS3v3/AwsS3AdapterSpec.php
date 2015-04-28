@@ -3,7 +3,7 @@
 namespace spec\League\Flysystem\AwsS3v3;
 
 use Aws\Result;
-use Aws\S3Client;
+use Aws\S3\S3Client;
 use GuzzleHttp\Command\CommandInterface;
 use GuzzleHttp\Stream\Stream;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
@@ -294,7 +294,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'ACL' => 'private',
         ])->willReturn($command);
 
-        $this->client->execute($command)->willThrow('Aws\Exception\S3Exception');
+        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
 
         $this->setVisibility($key, 'private')->shouldBe(false);
     }
@@ -422,7 +422,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'ACL' => 'private',
         ])->willReturn($command);
 
-        $this->client->execute($command)->willThrow('Aws\Exception\S3Exception');
+        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
     }
 
     public function getMatchers()
