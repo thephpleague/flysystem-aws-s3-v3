@@ -65,6 +65,25 @@ class AwsS3Adapter extends AbstractAdapter
     }
 
     /**
+     * Get the S3Client bucket.
+     *
+     * @return string
+     */
+    public function getBucket()
+    {
+        return $this->bucket;
+    }
+    /**
+     * Get the S3Client instance.
+     *
+     * @return S3Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
      * Write a new file.
      *
      * @param string $path
