@@ -2,7 +2,6 @@
 
 namespace League\Flysystem\AwsS3v3;
 
-use Aws\Result;
 use Aws\S3\ClearBucket;
 use Aws\S3\Exception\ClearBucketException;
 use Aws\S3\Exception\S3Exception;
