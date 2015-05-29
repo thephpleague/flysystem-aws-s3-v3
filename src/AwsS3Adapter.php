@@ -248,7 +248,15 @@ class AwsS3Adapter extends AbstractAdapter
         ]);
 
         /** @var Result $result */
-        $result = $this->s3Client->execute($command);
+        try {
+            $result = $this->s3Client->execute($command);
+        } catch (S3Exception $exception) {
+            if ($exception->getResponse()->getStatusCode() !== 404) {
+                throw $exception;
+            }
+
+            return false;
+        }
 
         return $this->normalizeResponse($result->toArray(), $path);
     }
