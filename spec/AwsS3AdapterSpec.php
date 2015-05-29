@@ -2,17 +2,19 @@
 
 namespace spec\League\Flysystem\AwsS3v3;
 
+use Aws\Command;
+use Aws\CommandInterface;
 use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
-use Aws\CommandInterface;
 use GuzzleHttp\Psr7;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
 use League\Flysystem\AdapterInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use Psr\Http\Message\ResponseInterface;
 
 class AwsS3AdapterSpec extends ObjectBehavior
 {
@@ -205,6 +207,44 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->execute($command)->willReturn($result);
 
         $this->listContents($prefix)->shouldHaveCount(2);
+    }
+
+    public function it_should_catch_404s_when_fetching_metadata()
+    {
+        $key = 'haha.txt';
+        $response = new Psr7\Response(404);
+        $command = new Command('dummy');
+        $exception = new S3Exception('Message', $command, [
+            'response' => $response,
+        ]);
+
+        $this->client->getCommand('headObject', [
+            'Bucket' => $this->bucket,
+            'Key' => $key,
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willThrow($exception);
+
+        $this->getMetadata($key)->shouldBe(false);
+    }
+
+    public function it_should_rethrow_non_404_responses_when_fetching_metadata()
+    {
+        $key = 'haha.txt';
+        $response = new Psr7\Response(500);
+        $command = new Command('dummy');
+        $exception = new S3Exception('Message', $command, [
+            'response' => $response,
+        ]);
+
+        $this->client->getCommand('headObject', [
+            'Bucket' => $this->bucket,
+            'Key' => $key,
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willThrow($exception);
+
+        $this->getMetadata($key)->shouldThrow($exception);
     }
 
     public function it_should_delete_directories(CommandInterface $command)
