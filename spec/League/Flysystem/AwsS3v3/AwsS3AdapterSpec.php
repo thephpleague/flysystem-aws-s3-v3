@@ -3,11 +3,14 @@
 namespace spec\League\Flysystem\AwsS3v3;
 
 use Aws\Result;
+use Aws\S3\Exception\DeleteMultipleObjectsException;
+use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
-use GuzzleHttp\Command\CommandInterface;
-use GuzzleHttp\Stream\Stream;
+use Aws\CommandInterface;
+use GuzzleHttp\Psr7;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
+use League\Flysystem\AdapterInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -35,8 +38,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
     public function it_is_initializable()
     {
-        $this->shouldHaveType('League\Flysystem\AwsS3v3\AwsS3Adapter');
-        $this->shouldHaveType('League\Flysystem\AdapterInterface');
+        $this->shouldHaveType(AwsS3Adapter::class);
+        $this->shouldHaveType(AdapterInterface::class);
     }
 
     public function it_should_write_files()
@@ -95,7 +98,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'Key' => $key = 'key.txt',
         ])->willReturn($command);
 
-        $this->client->execute($command)->willThrow('GuzzleHttp\Exception\RequestException');
+        $this->client->execute($command)->willThrow(S3Exception::class);
 
         $this->read($key)->shouldBe(false);
     }
@@ -206,50 +209,15 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
     public function it_should_delete_directories(CommandInterface $command)
     {
-        $iterator = new \ArrayIterator($batch = [
-            ['Key' => 'key.txt'],
-        ]);
-
-        $this->client->getIterator('ListObjects', [
-            'Bucket' => $this->bucket,
-            'Prefix' => 'prefix/',
-        ])->willReturn($iterator);
-
-        $this->client->getCommand('DeleteObjects', [
-            'Bucket' => $this->bucket,
-            'Delete' => [
-                'Objects' => $batch,
-            ]
-        ])->willReturn($command);
-
-        $this->client->execute($command)->willReturn(new Result([
-            'Errors' => [],
-        ]));
+        $this->client->deleteMatchingObjects($this->bucket, 'prefix/')->willReturn(null);
 
         $this->deleteDir('prefix')->shouldBe(true);
     }
 
     public function it_should_return_false_when_deleting_a_directory_fails(CommandInterface $command)
     {
-        $iterator = new \ArrayIterator($batch = [
-            ['Key' => 'key.txt'],
-        ]);
-
-        $this->client->getIterator('ListObjects', [
-            'Bucket' => $this->bucket,
-            'Prefix' => 'prefix/',
-        ])->willReturn($iterator);
-
-        $this->client->getCommand('DeleteObjects', [
-            'Bucket' => $this->bucket,
-            'Delete' => [
-                'Objects' => $batch,
-            ]
-        ])->willReturn($command);
-
-        $this->client->execute($command)->willReturn(new Result([
-            'Errors' => ['Error'],
-        ]));
+        $this->client->deleteMatchingObjects($this->bucket, 'prefix/')
+            ->willThrow(new DeleteMultipleObjectsException([], []));
 
         $this->deleteDir('prefix')->shouldBe(false);
     }
@@ -304,7 +272,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'ACL' => 'private',
         ])->willReturn($command);
 
-        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
+        $this->client->execute($command)->willThrow(S3Exception::class);
 
         $this->setVisibility($key, 'private')->shouldBe(false);
     }
@@ -355,7 +323,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     private function make_it_read_a_file(CommandInterface $command, $method, $contents)
     {
         $key = 'key.txt';
-        $stream = Stream::factory($contents);
+        $stream = Psr7\stream_for($contents);
         $result = new Result([
             'Key' => $key,
             'LastModified' => $date = date('Y-m-d h:i:s'),
@@ -429,10 +397,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'Bucket'     => $this->bucket,
             'Key'        => $key,
             'CopySource' => $this->bucket.'/'.$sourceKey,
-            'ACL' => 'private',
+            'ACL'        => 'private',
         ])->willReturn($command);
 
-        $this->client->execute($command)->willThrow('Aws\S3\Exception\S3Exception');
+        $this->client->execute($command)->willThrow(S3Exception::class);
     }
 
     public function getMatchers()

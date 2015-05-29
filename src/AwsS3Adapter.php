@@ -3,11 +3,9 @@
 namespace League\Flysystem\AwsS3v3;
 
 use Aws\Result;
-use Aws\S3\ClearBucket;
-use Aws\S3\Exception\ClearBucketException;
+use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
-use GuzzleHttp\Exception\RequestException;
 use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
@@ -144,10 +142,10 @@ class AwsS3Adapter extends AbstractAdapter
             'Key' => $location,
         ]);
 
-        /** @var Result $response */
-        $response = $this->s3Client->execute($command);
+        /** @var Result $result */
+        $result = $this->s3Client->execute($command);
 
-        return $response->get('DeleteMarker');
+        return $result->get('DeleteMarker');
     }
 
     /**
@@ -159,18 +157,10 @@ class AwsS3Adapter extends AbstractAdapter
      */
     public function deleteDir($dirname)
     {
-        $iterator = $this->s3Client->getIterator('ListObjects', [
-            'Bucket' => $this->bucket,
-            'Prefix' => ltrim($this->applyPathPrefix($dirname).'/', '/'),
-        ]);
-
-        $clearBucket = new ClearBucket($this->s3Client, $this->bucket, [
-            'iterator' => $iterator,
-        ]);
-
         try {
-            $clearBucket->clear();
-        } catch (ClearBucketException $exception) {
+            $prefix = $this->applyPathPrefix($dirname).'/';
+            $this->s3Client->deleteMatchingObjects($this->bucket, $prefix);
+        } catch (DeleteMultipleObjectsException $exception) {
             return false;
         }
 
@@ -257,10 +247,10 @@ class AwsS3Adapter extends AbstractAdapter
             'Key' => $this->applyPathPrefix($path),
         ]);
 
-        /** @var Result $response */
-        $response = $this->s3Client->execute($command);
+        /** @var Result $result */
+        $result = $this->s3Client->execute($command);
 
-        return $this->normalizeResponse($response->toArray(), $path);
+        return $this->normalizeResponse($result->toArray(), $path);
     }
 
     /**
@@ -392,7 +382,7 @@ class AwsS3Adapter extends AbstractAdapter
         try {
             /** @var Result $response */
             $response = $this->s3Client->execute($command);
-        } catch (RequestException $e) {
+        } catch (S3Exception $e) {
             return false;
         }
 
