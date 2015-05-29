@@ -331,7 +331,7 @@ class AwsS3Adapter extends AbstractAdapter
      * @param string $path
      * @param string $newpath
      *
-     * $return bool
+     * @return bool
      */
     public function copy($path, $newpath)
     {
