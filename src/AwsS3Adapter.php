@@ -115,7 +115,7 @@ class AwsS3Adapter extends AbstractAdapter
      * @param string $path
      * @param string $newpath
      *
-     * $return bool
+     * @return bool
      */
     public function rename($path, $newpath)
     {
@@ -131,7 +131,7 @@ class AwsS3Adapter extends AbstractAdapter
      *
      * @param string $path
      *
-     * $return bool
+     * @return bool
      */
     public function delete($path)
     {
@@ -153,7 +153,7 @@ class AwsS3Adapter extends AbstractAdapter
      *
      * @param string $dirname
      *
-     * $return bool
+     * @return bool
      */
     public function deleteDir($dirname)
     {
