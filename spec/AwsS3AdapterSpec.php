@@ -243,7 +243,6 @@ class AwsS3AdapterSpec extends ObjectBehavior
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow($exception);
-
         $this->getMetadata($key)->shouldThrow($exception);
     }
 
