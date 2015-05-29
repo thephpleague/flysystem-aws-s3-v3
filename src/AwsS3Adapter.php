@@ -189,7 +189,15 @@ class AwsS3Adapter extends AbstractAdapter
      */
     public function has($path)
     {
-        return $this->getMetadata($path);
+        try {
+            return $this->getMetadata($path) !== false;
+        } catch (S3Exception $e) {
+            if ($e->getAwsErrorCode() == 'NoSuchKey') {
+                return false;
+            }
+
+            throw $e;
+        }
     }
 
     /**
