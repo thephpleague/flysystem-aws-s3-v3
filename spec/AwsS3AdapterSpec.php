@@ -243,7 +243,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow($exception);
-        $this->getMetadata($key)->shouldThrow($exception);
+        $this->shouldThrow($exception)->duringGetMetadata($key);
     }
 
     public function it_should_delete_directories(CommandInterface $command)
