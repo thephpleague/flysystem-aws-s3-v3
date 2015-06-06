@@ -251,7 +251,9 @@ class AwsS3Adapter extends AbstractAdapter
         try {
             $result = $this->s3Client->execute($command);
         } catch (S3Exception $exception) {
-            if ($exception->getResponse()->getStatusCode() === 404) {
+            $response = $exception->getResponse();
+
+            if ($response !== null && $response->getStatusCode() === 404) {
                 return false;
             }
 
