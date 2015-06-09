@@ -230,7 +230,11 @@ class AwsS3Adapter extends AbstractAdapter
         /** @var Result $result */
         $result = $this->s3Client->execute($command);
 
-        return array_map([$this, 'normalizeResponse'], $result->get('Contents') ?: []);
+        $filter = function ($entry) {
+            return $entry['path'] !== false;
+        };
+
+        return array_filter(array_map([$this, 'normalizeResponse'], $result->get('Contents') ?: []), $filter);
     }
 
     /**
