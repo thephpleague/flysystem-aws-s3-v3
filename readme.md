@@ -26,9 +26,11 @@ use League\Flysystem\Filesystem;
 
 include __DIR__ . '/vendor/autoload.php';
 
-$client = S3Client::factory([
-    'key'    => 'your-key',
-    'secret' => 'your-secret',
+$client = new S3Client([
+    'credentials' = [
+        'key'    => 'your-key',
+        'secret' => 'your-secret'
+    ],
     'region' => 'your-region',
     'version' => 'latest|version',
 ]);
