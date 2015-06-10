@@ -206,7 +206,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
         $this->client->execute($command)->willReturn($result);
 
-        $this->listContents($prefix)->shouldHaveCount(2);
+        $this->listContents($prefix)->shouldHaveCount(3);
     }
 
     public function it_should_catch_404s_when_fetching_metadata()
