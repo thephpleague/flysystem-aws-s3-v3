@@ -230,7 +230,12 @@ class AwsS3Adapter extends AbstractAdapter
         /** @var Result $result */
         $result = $this->s3Client->execute($command);
 
-        return array_map([$this, 'normalizeResponse'], $result->get('Contents') ?: []);
+        return Util::emulateDirectories(
+            array_map(
+                [$this, 'normalizeResponse'],
+                $result->get('Contents') ?: []
+            )
+        );
     }
 
     /**
@@ -555,6 +560,7 @@ class AwsS3Adapter extends AbstractAdapter
     protected function normalizeResponse(array $response, $path = null)
     {
         $result = ['path' => $path ?: $this->removePathPrefix($response['Key'])];
+        $result = array_merge($result, Util::pathinfo($result['path']));
 
         if (isset($response['LastModified'])) {
             $result['timestamp'] = strtotime($response['LastModified']);
