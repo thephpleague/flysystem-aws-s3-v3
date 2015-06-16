@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3 - 2015-06-16
+
+### Fixed
+
+* Use an iterator for contents listing to break through the 1000 objects limit.
+
 ## 1.0.2 - 2015-06-06
 
 ### Fixed
