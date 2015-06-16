@@ -191,20 +191,15 @@ class AwsS3AdapterSpec extends ObjectBehavior
     public function it_should_list_contents(CommandInterface $command)
     {
         $prefix = 'prefix';
-
-        $this->client->getCommand('listObjects', [
-            'Bucket' => $this->bucket,
-            'Prefix' => $prefix.'/',
-        ])->willReturn($command);
-
-        $result = new Result([
-            'Contents' => [
-                ['Key' => 'prefix/filekey.txt'],
-                ['Key' => 'prefix/dirname/'],
-            ],
+        $iterator = new \ArrayIterator([
+            ['Key' => 'prefix/filekey.txt'],
+            ['Key' => 'prefix/dirname/'],
         ]);
 
-        $this->client->execute($command)->willReturn($result);
+        $this->client->getIterator('ListObjects', [
+            'Bucket' => $this->bucket,
+            'Prefix' => $prefix.'/',
+        ])->willReturn($iterator);
 
         $this->listContents($prefix)->shouldHaveCount(3);
     }

@@ -222,18 +222,15 @@ class AwsS3Adapter extends AbstractAdapter
     {
         $prefix = $this->applyPathPrefix(rtrim($directory, '/').'/');
 
-        $command = $this->s3Client->getCommand('listObjects', [
+        $iterator = $this->s3Client->getIterator('ListObjects', [
             'Bucket' => $this->bucket,
             'Prefix' => ltrim($prefix, '/'),
         ]);
 
-        /** @var Result $result */
-        $result = $this->s3Client->execute($command);
-
         return Util::emulateDirectories(
             array_map(
                 [$this, 'normalizeResponse'],
-                $result->get('Contents') ?: []
+                iterator_to_array($iterator)
             )
         );
     }
