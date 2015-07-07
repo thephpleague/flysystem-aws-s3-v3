@@ -20,7 +20,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
     private $client;
     private $bucket;
 
-    public function let(S3Client $client)
+    /**
+     * @param Aws\S3\S3Client $client
+     */
+    public function let($client)
     {
         $this->client = $client;
         $this->bucket = 'bucket';
