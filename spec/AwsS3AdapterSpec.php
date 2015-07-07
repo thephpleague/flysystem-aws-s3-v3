@@ -14,7 +14,6 @@ use League\Flysystem\Config;
 use League\Flysystem\AdapterInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Psr\Http\Message\ResponseInterface;
 
 class AwsS3AdapterSpec extends ObjectBehavior
 {
@@ -68,7 +67,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
         fclose($stream);
     }
 
-    public function it_should_delete_files(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_delete_files($command)
     {
         $this->client->getCommand('deleteObject', [
             'Bucket' => $this->bucket,
@@ -81,12 +83,18 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->delete($key)->shouldBe(true);
     }
 
-    public function it_should_read_a_file(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_read_a_file($command)
     {
         $this->make_it_read_a_file($command, 'read', 'contents');
     }
 
-    public function it_should_read_a_file_stream(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_read_a_file_stream($command)
     {
         $resource = tmpfile();
         $this->make_it_read_a_file($command, 'readStream', $resource);
@@ -106,32 +114,51 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->read($key)->shouldBe(false);
     }
 
-    public function it_should_retrieve_all_file_metadata(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_retrieve_all_file_metadata($command)
     {
         $this->make_it_retrieve_file_metadata('getMetadata', $command);
     }
 
-    public function it_should_retrieve_the_timestamp_of_a_file(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_retrieve_the_timestamp_of_a_file($command)
     {
         $this->make_it_retrieve_file_metadata('getTimestamp', $command);
     }
 
-    public function it_should_retrieve_the_mimetype_of_a_file(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_retrieve_the_mimetype_of_a_file($command)
     {
         $this->make_it_retrieve_file_metadata('getMimetype', $command);
     }
 
-    public function it_should_retrieve_the_size_of_a_file(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_retrieve_the_size_of_a_file($command)
     {
         $this->make_it_retrieve_file_metadata('getSize', $command);
     }
 
-    public function it_should_retrieve_the_metadata_to_check_if_an_object_exists(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_retrieve_the_metadata_to_check_if_an_object_exists($command)
     {
         $this->make_it_retrieve_file_metadata('has', $command);
     }
 
-    public function it_should_copy_files(CommandInterface $command, CommandInterface $aclCommand)
+    /**
+     * @param Aws\CommandInterface $command
+     * @param Aws\CommandInterface $aclCommand
+     */
+    public function it_should_copy_files($command, $aclCommand)
     {
         $key = 'key.txt';
         $sourceKey = 'newkey.txt';
@@ -140,7 +167,11 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->copy($sourceKey, $key)->shouldBe(true);
     }
 
-    public function it_should_return_false_when_copy_fails(CommandInterface $command, CommandInterface $aclCommand)
+    /**
+     * @param Aws\CommandInterface $command
+     * @param Aws\CommandInterface $aclCommand
+     */
+    public function it_should_return_false_when_copy_fails($command, $aclCommand)
     {
         $key = 'key.txt';
         $sourceKey = 'newkey.txt';
@@ -165,7 +196,11 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->createDir($path, $config)->shouldBeArray();
     }
 
-    public function it_should_return_false_during_rename_when_copy_fails(CommandInterface $command, CommandInterface $aclCommand)
+    /**
+     * @param Aws\CommandInterface $command
+     * @param Aws\CommandInterface $aclCommand
+     */
+    public function it_should_return_false_during_rename_when_copy_fails($command, $aclCommand)
     {
         $key = 'key.txt';
         $sourceKey = 'newkey.txt';
@@ -174,11 +209,12 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->rename($sourceKey, $key)->shouldBe(false);
     }
 
-    public function it_should_copy_and_delete_during_renames(
-        CommandInterface $copyCommand,
-        CommandInterface $deleteCommand,
-        CommandInterface $aclCommand
-    ) {
+    /**
+     * @param Aws\CommandInterface $copyCommand
+     * @param Aws\CommandInterface $deleteCommand
+     * @param Aws\CommandInterface $aclCommand
+     */
+    public function it_should_copy_and_delete_during_renames($copyCommand, $deleteCommand, $aclCommand) {
         $sourceKey = 'newkey.txt';
         $key = 'key.txt';
 
@@ -189,7 +225,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->rename($sourceKey, $key)->shouldBe(true);
     }
 
-    public function it_should_list_contents(CommandInterface $command)
+    public function it_should_list_contents()
     {
         $prefix = 'prefix';
         $iterator = new \ArrayIterator([
@@ -231,14 +267,20 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->shouldThrow($exception)->duringGetMetadata($key);
     }
 
-    public function it_should_delete_directories(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_delete_directories($command)
     {
         $this->client->deleteMatchingObjects($this->bucket, 'prefix/')->willReturn(null);
 
         $this->deleteDir('prefix')->shouldBe(true);
     }
 
-    public function it_should_return_false_when_deleting_a_directory_fails(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_return_false_when_deleting_a_directory_fails($command)
     {
         $this->client->deleteMatchingObjects($this->bucket, 'prefix/')
             ->willThrow(new DeleteMultipleObjectsException([], []));
@@ -246,7 +288,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->deleteDir('prefix')->shouldBe(false);
     }
 
-    public function it_should_get_the_visibility_of_a_public_file(CommandInterface $aclCommand)
+    /**
+     * @param Aws\CommandInterface $aclCommand
+     */
+    public function it_should_get_the_visibility_of_a_public_file($aclCommand)
     {
         $key = 'key.txt';
         $this->make_it_retrieve_raw_visibility($aclCommand, $key, 'public');
@@ -254,7 +299,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->getVisibility($key)->shouldHaveValue('public');
     }
 
-    public function it_should_get_the_visibility_of_a_private_file(CommandInterface $aclCommand)
+    /**
+     * @param Aws\CommandInterface $aclCommand
+     */
+    public function it_should_get_the_visibility_of_a_private_file($aclCommand)
     {
         $key = 'key.txt';
         $this->make_it_retrieve_raw_visibility($aclCommand, $key, 'private');
@@ -262,7 +310,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->getVisibility($key)->shouldHaveValue('private');
     }
 
-    public function it_should_set_the_visibility_of_a_file_to_public(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_set_the_visibility_of_a_file_to_public($command)
     {
         $this->client->getCommand('putObjectAcl', [
             'Bucket' => $this->bucket,
@@ -275,7 +326,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->setVisibility($key, 'public')->shouldHaveValue('public');
     }
 
-    public function it_should_set_the_visibility_of_a_file_to_private(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_set_the_visibility_of_a_file_to_private($command)
     {
         $this->client->getCommand('putObjectAcl', [
             'Bucket' => $this->bucket,
@@ -288,7 +342,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->setVisibility($key, 'private')->shouldHaveValue('private');
     }
 
-    public function it_should_return_false_when_failing_to_set_visibility(CommandInterface $command)
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_return_false_when_failing_to_set_visibility($command)
     {
         $this->client->getCommand('putObjectAcl', [
             'Bucket' => $this->bucket,
@@ -301,7 +358,12 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->setVisibility($key, 'private')->shouldBe(false);
     }
 
-    private function make_it_retrieve_raw_visibility(CommandInterface $command, $key, $visibility)
+    /**
+     * @param Aws\CommandInterface $command
+     * @param $key
+     * @param $visibility
+     */
+    private function make_it_retrieve_raw_visibility($command, $key, $visibility)
     {
         $options = [
             'private' => [
@@ -325,7 +387,11 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->execute($command)->willReturn($result);
     }
 
-    private function make_it_retrieve_file_metadata($method, CommandInterface $command)
+    /**
+     * @param $method
+     * @param Aws\CommandInterface $command
+     */
+    private function make_it_retrieve_file_metadata($method, $command)
     {
         $timestamp = time();
 
@@ -344,7 +410,12 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->{$method}($key)->shouldBeArray();
     }
 
-    private function make_it_read_a_file(CommandInterface $command, $method, $contents)
+    /**
+     * @param Aws\CommandInterface $command
+     * @param $method
+     * @param $contents
+     */
+    private function make_it_read_a_file($command, $method, $contents)
     {
         $key = 'key.txt';
         $stream = Psr7\stream_for($contents);
@@ -362,6 +433,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->{$method}($key)->shouldBeArray();
     }
 
+    /**
+     * @param $method
+     * @param $body
+     */
     private function make_it_write_using($method, $body)
     {
         $config = new Config(['visibility' => 'public', 'mimetype' => 'plain/text', 'CacheControl' => 'value']);
@@ -378,11 +453,11 @@ class AwsS3AdapterSpec extends ObjectBehavior
     }
 
     /**
-     * @param CommandInterface $copyCommand
+     * @param Aws\CommandInterface $copyCommand
      * @param                  $key
      * @param                  $sourceKey
      */
-    private function make_it_copy_successfully(CommandInterface $copyCommand, $key, $sourceKey, $acl)
+    private function make_it_copy_successfully($copyCommand, $key, $sourceKey, $acl)
     {
         $this->client->getCommand('copyObject', [
             'Bucket'     => $this->bucket,
@@ -395,10 +470,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
     }
 
     /**
-     * @param CommandInterface $deleteCommand
+     * @param Aws\CommandInterface $deleteCommand
      * @param                  $sourceKey
      */
-    private function make_it_delete_successfully(CommandInterface $deleteCommand, $sourceKey)
+    private function make_it_delete_successfully($deleteCommand, $sourceKey)
     {
         $deleteResult = new Result(['DeleteMarker' => true]);
 
@@ -411,11 +486,11 @@ class AwsS3AdapterSpec extends ObjectBehavior
     }
 
     /**
-     * @param CommandInterface $command
+     * @param Aws\CommandInterface $command
      * @param                  $key
      * @param                  $sourceKey
      */
-    private function make_it_fail_on_copy(CommandInterface $command, $key, $sourceKey)
+    private function make_it_fail_on_copy($command, $key, $sourceKey)
     {
         $this->client->getCommand('copyObject', [
             'Bucket'     => $this->bucket,
