@@ -104,9 +104,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
         fclose($resource);
     }
 
-    public function it_should_return_when_trying_to_read_an_non_existing_file(
-        CommandInterface $command
-    ) {
+    /**
+     * @param Aws\CommandInterface $command
+     */
+    public function it_should_return_when_trying_to_read_an_non_existing_file($command) {
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
             'Key' => $key = 'key.txt',
