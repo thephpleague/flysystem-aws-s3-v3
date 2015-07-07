@@ -3,7 +3,12 @@ language: php
 php:
   - 5.5
   - 5.6
+  - 7.0
   - hhvm
+
+matrix:
+  allow_failures:
+    - php: 7.0
 
 before_install:
   - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "hhvm" ]; then rm phpspec.yml; fi;'
@@ -16,5 +21,7 @@ script:
   - bin/phpspec run
 
 after_script:
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; wget https://scrutinizer-ci.com/ocular.phar; fi;'
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.xml; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "5.5" ]; wget https://scrutinizer-ci.com/ocular.phar; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "5.6" ]; wget https://scrutinizer-ci.com/ocular.phar; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "5.5" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.xml; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "5.6" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.xml; fi;'
