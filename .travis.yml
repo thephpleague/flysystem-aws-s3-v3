@@ -13,7 +13,9 @@ matrix:
 
 before_install:
   - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "hhvm" ]; then rm phpspec.yml; fi;'
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "hhvm" ]; then mv phpspec.hhvm.yml phpspec.yml; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "7.0" ]; then rm phpspec.yml; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "hhvm" ]; then mv phpspec.no-coverage.yml phpspec.yml; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "7.0" ]; then mv phpspec.no-coverage.yml phpspec.yml; fi;'
 
 install:
   - travis_retry composer install --no-interaction --prefer-source
