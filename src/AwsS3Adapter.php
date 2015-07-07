@@ -142,10 +142,9 @@ class AwsS3Adapter extends AbstractAdapter
             'Key' => $location,
         ]);
 
-        /** @var Result $result */
-        $result = $this->s3Client->execute($command);
+        $this->s3Client->execute($command);
 
-        return $result->get('DeleteMarker');
+        return ! $this->has($path);
     }
 
     /**

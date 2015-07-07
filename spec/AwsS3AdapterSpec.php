@@ -70,13 +70,14 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
     public function it_should_delete_files(CommandInterface $command)
     {
-        $result = new Result(['DeleteMarker' => true]);
         $this->client->getCommand('deleteObject', [
             'Bucket' => $this->bucket,
             'Key' => $key = 'key.txt',
         ])->willReturn($command);
 
-        $this->client->execute($command)->willReturn($result);
+        $this->client->execute($command)->shouldBeCalled();
+        $this->make_it_404_on_get_metadata($key);
+
         $this->delete($key)->shouldBe(true);
     }
 
@@ -184,7 +185,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->make_it_copy_successfully($copyCommand, $key, $sourceKey, 'private');
         $this->make_it_delete_successfully($deleteCommand, $sourceKey);
-
+        $this->make_it_404_on_get_metadata($sourceKey);
         $this->rename($sourceKey, $key)->shouldBe(true);
     }
 
@@ -207,18 +208,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     public function it_should_catch_404s_when_fetching_metadata()
     {
         $key = 'haha.txt';
-        $response = new Psr7\Response(404);
-        $command = new Command('dummy');
-        $exception = new S3Exception('Message', $command, [
-            'response' => $response,
-        ]);
-
-        $this->client->getCommand('headObject', [
-            'Bucket' => $this->bucket,
-            'Key' => $key,
-        ])->willReturn($command);
-
-        $this->client->execute($command)->willThrow($exception);
+        $this->make_it_404_on_get_metadata($key);
 
         $this->getMetadata($key)->shouldBe(false);
     }
@@ -447,5 +437,24 @@ class AwsS3AdapterSpec extends ObjectBehavior
                 return in_array($value, $subject);
             },
         ];
+    }
+
+    /**
+     * @param $key
+     */
+    private function make_it_404_on_get_metadata($key)
+    {
+        $response = new Psr7\Response(404);
+        $command = new Command('dummy');
+        $exception = new S3Exception('Message', $command, [
+            'response' => $response,
+        ]);
+
+        $this->client->getCommand('headObject', [
+            'Bucket' => $this->bucket,
+            'Key' => $key,
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willThrow($exception);
     }
 }
