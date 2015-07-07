@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4 - 2015-07-06
+
+### Fixed
+
+* Fixed delete return value.
+
 ## 1.0.3 - 2015-06-16
 
 ### Fixed
