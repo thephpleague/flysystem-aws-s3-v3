@@ -36,6 +36,7 @@ class AwsS3Adapter extends AbstractAdapter
         'Metadata',
         'ACL',
         'ContentType',
+        'ContentLength',
     ];
 
     /**
