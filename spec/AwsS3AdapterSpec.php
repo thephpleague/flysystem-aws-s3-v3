@@ -81,7 +81,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         ])->willReturn($command);
 
         $this->client->execute($command)->shouldBeCalled();
-        $this->make_it_404_on_get_metadata($key);
+        $this->make_it_404_on_has_object($key);
 
         $this->delete($key)->shouldBe(true);
     }
@@ -150,12 +150,11 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->make_it_retrieve_file_metadata('getSize', $command);
     }
 
-    /**
-     * @param Aws\CommandInterface $command
-     */
-    public function it_should_retrieve_the_metadata_to_check_if_an_object_exists($command)
+    public function it_should_return_true_when_object_exists()
     {
-        $this->make_it_retrieve_file_metadata('has', $command);
+        $key = 'key.txt';
+        $this->client->doesObjectExist($this->bucket, $key)->willReturn(true)->shouldBeCalled();
+        $this->has($key)->shouldBe(true);
     }
 
     /**
@@ -225,7 +224,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->make_it_copy_successfully($copyCommand, $key, $sourceKey, 'private');
         $this->make_it_delete_successfully($deleteCommand, $sourceKey);
-        $this->make_it_404_on_get_metadata($sourceKey);
+        $this->make_it_404_on_has_object($sourceKey);
         $this->rename($sourceKey, $key)->shouldBe(true);
     }
 
@@ -516,6 +515,14 @@ class AwsS3AdapterSpec extends ObjectBehavior
                 return in_array($value, $subject);
             },
         ];
+    }
+
+    /**
+     * @param $key
+     */
+    private function make_it_404_on_has_object($key)
+    {
+        $this->client->doesObjectExist($this->bucket, $key)->willReturn(false);
     }
 
     /**
