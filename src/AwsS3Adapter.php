@@ -188,7 +188,7 @@ class AwsS3Adapter extends AbstractAdapter
      */
     public function has($path)
     {
-        return $this->getMetadata($path);
+        return $this->s3Client->doesObjectExist($this->bucket, $path);
     }
 
     /**
