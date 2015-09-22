@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5 - 2015-09-22
+
+### Fixed
+
+* `has` calls now use `doesObjectExist` rather than retrieving metadata.
+
 ## 1.0.4 - 2015-07-06
 
 ### Fixed
