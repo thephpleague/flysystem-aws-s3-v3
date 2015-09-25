@@ -50,17 +50,24 @@ class AwsS3Adapter extends AbstractAdapter
     protected $bucket;
 
     /**
+     * @var array
+     */
+    protected $options = [];
+
+    /**
      * Constructor.
      *
      * @param S3Client $client
-     * @param          $bucket
+     * @param string   $bucket
      * @param string   $prefix
+     * @param array    $options
      */
-    public function __construct(S3Client $client, $bucket, $prefix = '')
+    public function __construct(S3Client $client, $bucket, $prefix = '', array $options = [])
     {
         $this->s3Client = $client;
         $this->bucket = $bucket;
         $this->setPathPrefix($prefix);
+        $this->options = $options;
     }
 
     /**
@@ -467,6 +474,9 @@ class AwsS3Adapter extends AbstractAdapter
         return ltrim(parent::applyPathPrefix($prefix), '/');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setPathPrefix($prefix)
     {
         $prefix = ltrim($prefix, '/');
@@ -545,7 +555,7 @@ class AwsS3Adapter extends AbstractAdapter
      */
     protected function getOptionsFromConfig(Config $config)
     {
-        $options = [];
+        $options = $this->options;
 
         if ($visibility = $config->get('visibility')) {
             // For local reference

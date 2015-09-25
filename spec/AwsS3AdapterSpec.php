@@ -17,6 +17,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 {
     private $client;
     private $bucket;
+    const PATH_PREFIX = 'path-prefix';
 
     /**
      * @param \Aws\S3\S3Client $client
@@ -25,7 +26,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     {
         $this->client = $client;
         $this->bucket = 'bucket';
-        $this->beConstructedWith($this->client, $this->bucket);
+        $this->beConstructedWith($this->client, $this->bucket, self::PATH_PREFIX);
     }
 
     public function it_should_retrieve_the_bucket()
@@ -73,9 +74,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_delete_files($command)
     {
+        $key = 'key.txt';
         $this->client->getCommand('deleteObject', [
             'Bucket' => $this->bucket,
-            'Key' => $key = 'key.txt',
+            'Key' => self::PATH_PREFIX.'/'.$key,
         ])->willReturn($command);
 
         $this->client->execute($command)->shouldBeCalled();
@@ -107,9 +109,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_return_when_trying_to_read_an_non_existing_file($command)
     {
+        $key = 'key.txt';
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
-            'Key' => $key = 'key.txt',
+            'Key' => self::PATH_PREFIX.'/'.$key,
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow(S3Exception::class);
@@ -152,7 +155,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     public function it_should_return_true_when_object_exists()
     {
         $key = 'key.txt';
-        $this->client->doesObjectExist($this->bucket, $key)->willReturn(true)->shouldBeCalled();
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(true);
         $this->has($key)->shouldBe(true);
     }
 
@@ -189,7 +192,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $body = '';
         $this->client->upload(
             $this->bucket,
-            $path.'/',
+            self::PATH_PREFIX.'/'.$path.'/',
             $body,
             'private',
             Argument::type('array')
@@ -232,13 +235,13 @@ class AwsS3AdapterSpec extends ObjectBehavior
     {
         $prefix = 'prefix';
         $iterator = new \ArrayIterator([
-            ['Key' => 'prefix/filekey.txt'],
-            ['Key' => 'prefix/dirname/'],
+            ['Key' => self::PATH_PREFIX.'/'.'prefix/filekey.txt'],
+            ['Key' => self::PATH_PREFIX.'/'.'prefix/dirname/'],
         ]);
 
         $this->client->getIterator('ListObjects', [
             'Bucket' => $this->bucket,
-            'Prefix' => $prefix.'/',
+            'Prefix' => self::PATH_PREFIX.'/'.$prefix.'/',
         ])->willReturn($iterator);
 
         $this->listContents($prefix)->shouldHaveCount(3);
@@ -263,29 +266,23 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
         $this->client->getCommand('headObject', [
             'Bucket' => $this->bucket,
-            'Key' => $key,
+            'Key' => self::PATH_PREFIX.'/'.$key,
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow($exception);
         $this->shouldThrow($exception)->duringGetMetadata($key);
     }
 
-    /**
-     * @param \Aws\CommandInterface $command
-     */
-    public function it_should_delete_directories($command)
+    public function it_should_delete_directories()
     {
-        $this->client->deleteMatchingObjects($this->bucket, 'prefix/')->willReturn(null);
+        $this->client->deleteMatchingObjects($this->bucket, self::PATH_PREFIX.'/'.'prefix/')->willReturn(null);
 
         $this->deleteDir('prefix')->shouldBe(true);
     }
 
-    /**
-     * @param \Aws\CommandInterface $command
-     */
-    public function it_should_return_false_when_deleting_a_directory_fails($command)
+    public function it_should_return_false_when_deleting_a_directory_fails()
     {
-        $this->client->deleteMatchingObjects($this->bucket, 'prefix/')
+        $this->client->deleteMatchingObjects($this->bucket, self::PATH_PREFIX.'/'.'prefix/')
             ->willThrow(new DeleteMultipleObjectsException([], []));
 
         $this->deleteDir('prefix')->shouldBe(false);
@@ -318,9 +315,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_set_the_visibility_of_a_file_to_public($command)
     {
+        $key = 'key.txt';
         $this->client->getCommand('putObjectAcl', [
             'Bucket' => $this->bucket,
-            'Key' => $key = 'key.txt',
+            'Key' => self::PATH_PREFIX.'/'.$key,
             'ACL' => 'public-read',
         ])->willReturn($command);
 
@@ -334,9 +332,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_set_the_visibility_of_a_file_to_private($command)
     {
+        $key = 'key.txt';
         $this->client->getCommand('putObjectAcl', [
             'Bucket' => $this->bucket,
-            'Key' => $key = 'key.txt',
+            'Key' => self::PATH_PREFIX.'/'.$key,
             'ACL' => 'private',
         ])->willReturn($command);
 
@@ -350,9 +349,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_return_false_when_failing_to_set_visibility($command)
     {
+        $key = 'key.txt';
         $this->client->getCommand('putObjectAcl', [
             'Bucket' => $this->bucket,
-            'Key' => $key = 'key.txt',
+            'Key' => self::PATH_PREFIX.'/'.$key,
             'ACL' => 'private',
         ])->willReturn($command);
 
@@ -379,7 +379,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
         $this->client->getCommand('getObjectAcl', [
             'Bucket' => $this->bucket,
-            'Key' => $key,
+            'Key' => self::PATH_PREFIX.'/'.$key,
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
@@ -388,16 +388,17 @@ class AwsS3AdapterSpec extends ObjectBehavior
     private function make_it_retrieve_file_metadata($method, $command)
     {
         $timestamp = time();
+        $key = 'key.txt';
 
         $result = new Result([
-            'Key' => $key = 'key.txt',
+            'Key' => self::PATH_PREFIX.'/'.$key,
             'LastModified' => date('Y-m-d H:i:s', $timestamp),
             'ContentType' => 'plain/text',
         ]);
 
         $this->client->getCommand('headObject', [
             'Bucket' => $this->bucket,
-            'Key' => $key,
+            'Key' => self::PATH_PREFIX.'/'.$key,
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
@@ -409,13 +410,13 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $key = 'key.txt';
         $stream = Psr7\stream_for($contents);
         $result = new Result([
-            'Key' => $key,
+            'Key' => self::PATH_PREFIX.'/'.$key,
             'LastModified' => $date = date('Y-m-d h:i:s'),
             'Body' => $stream,
         ]);
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
-            'Key' => $key,
+            'Key' => self::PATH_PREFIX.'/'.$key,
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
@@ -425,24 +426,24 @@ class AwsS3AdapterSpec extends ObjectBehavior
     private function make_it_write_using($method, $body)
     {
         $config = new Config(['visibility' => 'public', 'mimetype' => 'plain/text', 'CacheControl' => 'value']);
-        $path = 'key.txt';
+        $key = 'key.txt';
         $this->client->upload(
             $this->bucket,
-            $path,
+            self::PATH_PREFIX.'/'.$key,
             $body,
             'public-read',
             Argument::type('array')
         )->shouldBeCalled();
 
-        $this->{$method}($path, $body, $config)->shouldBeArray();
+        $this->{$method}($key, $body, $config)->shouldBeArray();
     }
 
     private function make_it_copy_successfully($copyCommand, $key, $sourceKey, $acl)
     {
         $this->client->getCommand('copyObject', [
             'Bucket' => $this->bucket,
-            'Key' => $key,
-            'CopySource' => $this->bucket.'/'.$sourceKey,
+            'Key' => self::PATH_PREFIX.'/'.$key,
+            'CopySource' => $this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey,
             'ACL' => $acl,
         ])->willReturn($copyCommand);
 
@@ -455,7 +456,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
         $this->client->getCommand('deleteObject', [
             'Bucket' => $this->bucket,
-            'Key' => $sourceKey,
+            'Key' => self::PATH_PREFIX.'/'.$sourceKey,
         ])->willReturn($deleteCommand);
 
         $this->client->execute($deleteCommand)->willReturn($deleteResult);
@@ -465,8 +466,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
     {
         $this->client->getCommand('copyObject', [
             'Bucket' => $this->bucket,
-            'Key' => $key,
-            'CopySource' => $this->bucket.'/'.$sourceKey,
+            'Key' => self::PATH_PREFIX.'/'.$key,
+            'CopySource' => $this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey,
             'ACL' => 'private',
         ])->willReturn($command);
 
@@ -487,7 +488,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
     private function make_it_404_on_has_object($key)
     {
-        $this->client->doesObjectExist($this->bucket, $key)->willReturn(false);
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(false);
     }
 
     private function make_it_404_on_get_metadata($key)
@@ -500,7 +501,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
         $this->client->getCommand('headObject', [
             'Bucket' => $this->bucket,
-            'Key' => $key,
+            'Key' => self::PATH_PREFIX.'/'.$key,
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow($exception);
