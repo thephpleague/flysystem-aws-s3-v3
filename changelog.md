@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.6 - 2015-09-25
+
+### Fixed
+
+* The `has` operation now respects path prefix, bug introduced in 1.0.5.
+
 ## 1.0.5 - 2015-09-22
 
 ### Fixed
