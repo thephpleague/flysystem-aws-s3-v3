@@ -7,9 +7,9 @@ use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
 use GuzzleHttp\Psr7;
+use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
-use League\Flysystem\AdapterInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -28,7 +28,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->beConstructedWith($this->client, $this->bucket);
     }
 
-    public function it_should_retrieve_the_bucket() 
+    public function it_should_retrieve_the_bucket()
     {
         $this->getBucket()->shouldBe('bucket');
     }
@@ -105,7 +105,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
     /**
      * @param \Aws\CommandInterface $command
      */
-    public function it_should_return_when_trying_to_read_an_non_existing_file($command) {
+    public function it_should_return_when_trying_to_read_an_non_existing_file($command)
+    {
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
             'Key' => $key = 'key.txt',
@@ -215,7 +216,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
      * @param \Aws\CommandInterface $deleteCommand
      * @param \Aws\CommandInterface $aclCommand
      */
-    public function it_should_copy_and_delete_during_renames($copyCommand, $deleteCommand, $aclCommand) {
+    public function it_should_copy_and_delete_during_renames($copyCommand, $deleteCommand, $aclCommand)
+    {
         $sourceKey = 'newkey.txt';
         $key = 'key.txt';
 
@@ -438,10 +440,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
     private function make_it_copy_successfully($copyCommand, $key, $sourceKey, $acl)
     {
         $this->client->getCommand('copyObject', [
-            'Bucket'     => $this->bucket,
-            'Key'        => $key,
+            'Bucket' => $this->bucket,
+            'Key' => $key,
             'CopySource' => $this->bucket.'/'.$sourceKey,
-            'ACL'        => $acl,
+            'ACL' => $acl,
         ])->willReturn($copyCommand);
 
         $this->client->execute($copyCommand)->shouldBeCalled();
@@ -453,7 +455,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
         $this->client->getCommand('deleteObject', [
             'Bucket' => $this->bucket,
-            'Key'    => $sourceKey,
+            'Key' => $sourceKey,
         ])->willReturn($deleteCommand);
 
         $this->client->execute($deleteCommand)->willReturn($deleteResult);
@@ -462,10 +464,10 @@ class AwsS3AdapterSpec extends ObjectBehavior
     private function make_it_fail_on_copy($command, $key, $sourceKey)
     {
         $this->client->getCommand('copyObject', [
-            'Bucket'     => $this->bucket,
-            'Key'        => $key,
+            'Bucket' => $this->bucket,
+            'Key' => $key,
             'CopySource' => $this->bucket.'/'.$sourceKey,
-            'ACL'        => 'private',
+            'ACL' => 'private',
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow(S3Exception::class);
