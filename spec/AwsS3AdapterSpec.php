@@ -6,6 +6,7 @@ use Aws\Command;
 use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
+use GuzzleHttp\Promise;
 use GuzzleHttp\Psr7;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
@@ -231,20 +232,33 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->rename($sourceKey, $key)->shouldBe(true);
     }
 
-    public function it_should_list_contents()
+    /**
+     * @param \Aws\ResultPaginator $resultPaginator
+     */
+    public function it_should_list_contents($resultPaginator)
     {
         $prefix = 'prefix';
-        $iterator = new \ArrayIterator([
-            ['Key' => self::PATH_PREFIX.'/'.'prefix/filekey.txt'],
-            ['Key' => self::PATH_PREFIX.'/'.'prefix/dirname/'],
+
+        $result = new Result([
+            'Contents' => [
+                ['Key' => self::PATH_PREFIX.'/'.'prefix/filekey.txt'],
+            ],
+            'CommonPrefixes' => [
+                ['Prefix' => self::PATH_PREFIX.'/prefix/dirname/']
+            ]
         ]);
 
-        $this->client->getIterator('ListObjects', [
+        $resultPaginator->each(Argument::type('callable'))
+            ->shouldBeCalled()
+            ->willReturn(Promise\promise_for($result));
+
+        $this->client->getPaginator('ListObjects', [
             'Bucket' => $this->bucket,
             'Prefix' => self::PATH_PREFIX.'/'.$prefix.'/',
-        ])->willReturn($iterator);
+            'Delimiter' => '/'
+        ])->shouldBeCalled()->willReturn($resultPaginator);
 
-        $this->listContents($prefix)->shouldHaveCount(3);
+        $this->listContents($prefix);
     }
 
     public function it_should_catch_404s_when_fetching_metadata()
