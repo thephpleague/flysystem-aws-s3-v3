@@ -443,7 +443,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('copyObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
-            'CopySource' => $this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey,
+            'CopySource' => urlencode($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
             'ACL' => $acl,
         ])->willReturn($copyCommand);
 
@@ -467,7 +467,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('copyObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
-            'CopySource' => $this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey,
+            'CopySource' => urlencode($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
             'ACL' => 'private',
         ])->willReturn($command);
 
