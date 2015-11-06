@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7 - 2015-11-06
+
+### Fixed
+
+* The `copy` operation now `urlencode`'s the `CopySource` to allow characters like `+`.
+
 ## 1.0.6 - 2015-09-25
 
 ### Fixed
