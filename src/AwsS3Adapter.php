@@ -235,9 +235,28 @@ class AwsS3Adapter extends AbstractAdapter
     {
         $prefix = $this->applyPathPrefix(rtrim($directory, '/').'/');
         $options = ['Bucket' => $this->bucket, 'Prefix' => ltrim($prefix, '/')];
-        $iterator = $this->s3Client->getIterator('ListObjects', $options);
+
+        if (!$recursive) {
+            $options['Delimiter'] = '/';
+        }
+
+        $results = $this->s3Client->getPaginator('ListObjects', $options);
+
+        $listing = [];
+
+        $promise = $results->each(function ($result) use (&$listing, $recursive) {
+            $listing = array_merge($listing, $result->get('Contents') ?: []);
+
+            if (!$recursive) {
+                $listing = array_merge($listing, $result->get('CommonPrefixes') ?: []);
+            }
+        });
+
+        $promise->wait();
+
         $normalizer = [$this, 'normalizeResponse'];
-        $normalized = array_map($normalizer, iterator_to_array($iterator));
+
+        $normalized = array_map($normalizer, $listing);
 
         return Util::emulateDirectories($normalized);
     }
@@ -582,7 +601,7 @@ class AwsS3Adapter extends AbstractAdapter
      */
     protected function normalizeResponse(array $response, $path = null)
     {
-        $result = ['path' => $path ?: $this->removePathPrefix($response['Key'])];
+        $result = ['path' => $path ?: $this->removePathPrefix(isset($response['Key']) ? $response['Key'] : $response['Prefix'])];
         $result = array_merge($result, Util::pathinfo($result['path']));
 
         if (isset($response['LastModified'])) {
