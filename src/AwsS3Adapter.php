@@ -233,29 +233,21 @@ class AwsS3Adapter extends AbstractAdapter
      */
     public function listContents($directory = '', $recursive = false)
     {
+        $listing = [];
         $prefix = $this->applyPathPrefix(rtrim($directory, '/').'/');
         $options = ['Bucket' => $this->bucket, 'Prefix' => ltrim($prefix, '/')];
 
-        if (!$recursive) {
+        if ($recursive === false) {
             $options['Delimiter'] = '/';
         }
 
         $results = $this->s3Client->getPaginator('ListObjects', $options);
-
-        $listing = [];
-
-        $promise = $results->each(function ($result) use (&$listing, $recursive) {
-            $listing = array_merge($listing, $result->get('Contents') ?: []);
-
-            if (!$recursive) {
-                $listing = array_merge($listing, $result->get('CommonPrefixes') ?: []);
-            }
+        $promise = $results->each(function (Result $result) use (&$listing, $recursive) {
+            $listing = array_merge($listing, $result->get('Contents') ?: [], $result->get('CommonPrefixes') ?: []);
         });
 
         $promise->wait();
-
         $normalizer = [$this, 'normalizeResponse'];
-
         $normalized = array_map($normalizer, $listing);
 
         return Util::emulateDirectories($normalized);
