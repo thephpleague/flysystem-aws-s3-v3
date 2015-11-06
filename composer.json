@@ -22,6 +22,11 @@
             "League\\Flysystem\\AwsS3v3\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "League\\Flysystem\\AwsS3v3\\Stub\\": "stub"
+        }
+    },
     "config": {
         "bin-dir": "bin"
     },

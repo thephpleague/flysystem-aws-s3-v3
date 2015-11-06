@@ -10,6 +10,7 @@ use GuzzleHttp\Promise;
 use GuzzleHttp\Psr7;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3v3\Stub\ResultPaginator;
 use League\Flysystem\Config;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -232,31 +233,23 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->rename($sourceKey, $key)->shouldBe(true);
     }
 
-    /**
-     * @param \Aws\ResultPaginator $resultPaginator
-     */
-    public function it_should_list_contents($resultPaginator)
+    public function it_should_list_contents()
     {
         $prefix = 'prefix';
-
         $result = new Result([
             'Contents' => [
-                ['Key' => self::PATH_PREFIX.'/'.'prefix/filekey.txt'],
+                ['Key' => self::PATH_PREFIX.'/prefix/filekey.txt'],
             ],
             'CommonPrefixes' => [
                 ['Prefix' => self::PATH_PREFIX.'/prefix/dirname/']
             ]
         ]);
 
-        $resultPaginator->each(Argument::type('callable'))
-            ->shouldBeCalled()
-            ->willReturn(Promise\promise_for($result));
-
         $this->client->getPaginator('ListObjects', [
             'Bucket' => $this->bucket,
             'Prefix' => self::PATH_PREFIX.'/'.$prefix.'/',
             'Delimiter' => '/'
-        ])->shouldBeCalled()->willReturn($resultPaginator);
+        ])->shouldBeCalled()->willReturn(new ResultPaginator($result));
 
         $this->listContents($prefix);
     }

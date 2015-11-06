@@ -2,6 +2,7 @@
 
 namespace League\Flysystem\AwsS3v3;
 
+use ArrayIterator;
 use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
@@ -10,6 +11,8 @@ use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 
 class AwsS3Adapter extends AbstractAdapter
 {
@@ -233,7 +236,6 @@ class AwsS3Adapter extends AbstractAdapter
      */
     public function listContents($directory = '', $recursive = false)
     {
-        $listing = [];
         $prefix = $this->applyPathPrefix(rtrim($directory, '/').'/');
         $options = ['Bucket' => $this->bucket, 'Prefix' => ltrim($prefix, '/')];
 
@@ -241,18 +243,28 @@ class AwsS3Adapter extends AbstractAdapter
             $options['Delimiter'] = '/';
         }
 
-        $results = $this->s3Client->getPaginator('ListObjects', $options);
-        $promise = $results->each(function (Result $result) use (&$listing, $recursive) {
-            // @codeCoverageIgnoreStart
-            $listing = array_merge($listing, $result->get('Contents') ?: [], $result->get('CommonPrefixes') ?: []);
-            // @codeCoverageIgnoreEnd
-        });
-
-        $promise->wait();
+        $listing = $this->retrievePaginatedListing($options);
         $normalizer = [$this, 'normalizeResponse'];
         $normalized = array_map($normalizer, $listing);
 
         return Util::emulateDirectories($normalized);
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return array
+     */
+    protected function retrievePaginatedListing(array $options)
+    {
+        $resultPaginator = $this->s3Client->getPaginator('ListObjects', $options);
+        $listingMerger = function (Result $result) {
+            return array_merge($result->get('Contents') ?: [], $result->get('CommonPrefixes') ?: []);
+        };
+
+        $promise = $resultPaginator->each($listingMerger);
+
+        return $promise->wait();
     }
 
     /**
