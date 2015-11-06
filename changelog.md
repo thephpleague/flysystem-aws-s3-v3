@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.8 - 2015-11-06
+
+### Improved
+
+* Non-recursive listings now retrieve a shallow listing for better performance.
+
 ## 1.0.7 - 2015-11-06
 
 ### Fixed
