@@ -243,7 +243,9 @@ class AwsS3Adapter extends AbstractAdapter
 
         $results = $this->s3Client->getPaginator('ListObjects', $options);
         $promise = $results->each(function (Result $result) use (&$listing, $recursive) {
+            // @codeCoverageIgnoreStart
             $listing = array_merge($listing, $result->get('Contents') ?: [], $result->get('CommonPrefixes') ?: []);
+            // @codeCoverageIgnoreEnd
         });
 
         $promise->wait();
