@@ -356,7 +356,7 @@ class AwsS3Adapter extends AbstractAdapter
             [
                 'Bucket' => $this->bucket,
                 'Key' => $this->applyPathPrefix($newpath),
-                'CopySource' => $this->bucket.'/'.$this->applyPathPrefix($path),
+                'CopySource' => urlencode($this->bucket.'/'.$this->applyPathPrefix($path)),
                 'ACL' => $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private',
             ]
         );
