@@ -258,13 +258,13 @@ class AwsS3Adapter extends AbstractAdapter
     protected function retrievePaginatedListing(array $options)
     {
         $resultPaginator = $this->s3Client->getPaginator('ListObjects', $options);
-        $listingMerger = function (Result $result) {
-            return array_merge($result->get('Contents') ?: [], $result->get('CommonPrefixes') ?: []);
-        };
+        $listing = [];
 
-        $promise = $resultPaginator->each($listingMerger);
+        foreach ($resultPaginator as $result) {
+            $listing = array_merge($listing, $result->get('Contents') ?: [], $result->get('CommonPrefixes') ?: []);
+        }
 
-        return $promise->wait();
+        return $listing;
     }
 
     /**
