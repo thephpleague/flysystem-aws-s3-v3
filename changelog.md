@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.9 - 2015-11-19
+
+### Fixed
+
+* [#49] Large listings only returned the last page of the listing.
+
 ## 1.0.8 - 2015-11-06
 
 ### Improved
