@@ -40,6 +40,7 @@ class AwsS3Adapter extends AbstractAdapter
         'ACL',
         'ContentType',
         'ContentEncoding',
+        'ContentDisposition',
     ];
 
     /**
