@@ -41,6 +41,7 @@ class AwsS3Adapter extends AbstractAdapter
         'ContentType',
         'ContentEncoding',
         'ContentDisposition',
+        'ContentLength',
     ];
 
     /**
