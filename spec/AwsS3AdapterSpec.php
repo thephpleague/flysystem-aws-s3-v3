@@ -64,6 +64,28 @@ class AwsS3AdapterSpec extends ObjectBehavior
         fclose($stream);
     }
 
+    public function it_should_detect_content_type_from_path_when_write_streamed()
+    {
+        $config = new Config();
+        $path = 'foo.css';
+        $stream = tmpfile();
+        $this->client->upload(
+            $this->bucket,
+            self::PATH_PREFIX.'/'.$path,
+            $stream,
+            'private',
+            [
+                'params' => [
+                    'ContentType'   => 'text/css',
+                    'ContentLength' => 0,
+                ]
+            ]
+        )->shouldBeCalled();
+
+        $this->writeStream($path, $stream, $config)->shouldBeArray();
+        fclose($stream);
+    }
+
     public function it_should_update_files_streamed()
     {
         $stream = tmpfile();
