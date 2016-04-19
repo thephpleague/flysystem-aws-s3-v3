@@ -17,6 +17,9 @@ use Prophecy\Argument;
 
 class AwsS3AdapterSpec extends ObjectBehavior
 {
+    /**
+     * @var \Aws\S3\S3Client
+     */
     private $client;
     private $bucket;
     const PATH_PREFIX = 'path-prefix';
@@ -163,11 +166,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     {
         $key = 'key.txt';
         $result = new Result();
-        $this->client->getCommand('headObject', [
-            'Bucket' => $this->bucket,
-            'Key' => self::PATH_PREFIX.'/'.$key
-        ])->willReturn($command);
-        $this->client->execute($command)->willReturn($result);
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(true);
 
         $this->has($key)->shouldBe(true);
     }
@@ -183,11 +182,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
                 'Key' => 'directory/foo.txt',
             ],
         ]);
-        $this->client->getCommand('headObject', [
-            'Bucket' => $this->bucket,
-            'Key' => self::PATH_PREFIX.'/'.$key
-        ])->willReturn($command);
-        $this->client->execute($command)->willThrow(S3Exception::class);
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(false);
 
         $this->client->getCommand('listObjects', [
             'Bucket' => $this->bucket,
@@ -535,11 +530,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
     private function make_it_404_on_has_object($headCommand, $listCommand, $key)
     {
-        $this->client->getCommand('headObject', [
-            'Bucket' => $this->bucket,
-            'Key' => self::PATH_PREFIX.'/'.$key
-        ])->willReturn($headCommand);
-        $this->client->execute($headCommand)->willThrow(S3Exception::class);
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(false);
 
         $result = new Result();
         $this->client->getCommand('listObjects', [
