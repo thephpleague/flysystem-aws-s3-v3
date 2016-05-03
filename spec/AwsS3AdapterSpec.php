@@ -196,6 +196,54 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
     /**
      * @param \Aws\CommandInterface $command
+     * @param \Aws\S3\Exception\S3Exception $exception
+     */
+    public function it_should_return_false_when_listing_objects_returns_a_403($command, $exception)
+    {
+        $key = 'directory';
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(false);
+
+        $this->client->getCommand('listObjects', [
+            'Bucket' => $this->bucket,
+            'Prefix' => self::PATH_PREFIX.'/'.$key.'/',
+            'MaxKeys' => 1,
+        ])->willReturn($command);
+        $response = new Psr7\Response(403);
+        $exception = new S3Exception('Message', new Command('dummy'), [
+            'response' => $response,
+        ]);
+
+        $this->client->execute($command)->willThrow($exception);
+
+        $this->has($key)->shouldBe(false);
+    }
+
+    /**
+     * @param \Aws\CommandInterface $command
+     * @param \Aws\S3\Exception\S3Exception $exception
+     */
+    public function it_should_pass_through_when_listing_objects_throws_an_exception($command, $exception)
+    {
+        $key = 'directory';
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(false);
+
+        $this->client->getCommand('listObjects', [
+            'Bucket' => $this->bucket,
+            'Prefix' => self::PATH_PREFIX.'/'.$key.'/',
+            'MaxKeys' => 1,
+        ])->willReturn($command);
+        $response = new Psr7\Response(500);
+        $exception = new S3Exception('Message', new Command('dummy'), [
+            'response' => $response,
+        ]);
+
+        $this->client->execute($command)->willThrow($exception);
+
+        $this->shouldThrow(S3Exception::class)->duringHas($key);
+    }
+
+    /**
+     * @param \Aws\CommandInterface $command
      * @param \Aws\CommandInterface $aclCommand
      */
     public function it_should_copy_files($command, $aclCommand)
