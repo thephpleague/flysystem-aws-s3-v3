@@ -411,7 +411,6 @@ class AwsS3Adapter extends AbstractAdapter
 
         if ($response !== false) {
             $response['stream'] = $response['contents']->detach();
-            rewind($response['stream']);
             unset($response['contents']);
         }
 
@@ -432,6 +431,9 @@ class AwsS3Adapter extends AbstractAdapter
             [
                 'Bucket' => $this->bucket,
                 'Key' => $this->applyPathPrefix($path),
+                '@http' => [
+                    'stream' => true,
+                ],
             ]
         );
 
