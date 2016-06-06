@@ -120,6 +120,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
+            '@http' => [
+                'stream' => true,
+            ],
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow(S3Exception::class);
@@ -507,6 +510,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
+            '@http' => [
+                'stream' => true,
+            ],
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
