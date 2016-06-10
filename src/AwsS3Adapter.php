@@ -39,6 +39,7 @@ class AwsS3Adapter extends AbstractAdapter
         'ContentEncoding',
         'ContentDisposition',
         'ContentLength',
+        'WebsiteRedirectLocation'
     ];
 
     /**
