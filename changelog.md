@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.13 - 2016-06-21
+
+### Fixed
+
+* Uploading a remote stream no longer results in an unexpected exception.
+
 ## 1.0.12 - 2016-06-06
 
 ### Improved
