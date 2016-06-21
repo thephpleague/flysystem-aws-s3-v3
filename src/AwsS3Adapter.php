@@ -561,6 +561,10 @@ class AwsS3Adapter extends AbstractAdapter
             $options['ContentLength'] = is_string($body) ? Util::contentSize($body) : Util::getStreamSize($body);
         }
 
+        if ($options['ContentLength'] === null) {
+            unset($options['ContentLength']);
+        }
+
         $this->s3Client->upload($this->bucket, $key, $body, $acl, ['params' => $options]);
 
         return $this->normalizeResponse($options, $key);
