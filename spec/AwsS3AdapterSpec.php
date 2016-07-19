@@ -121,7 +121,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
             '@http' => [
-                'stream' => true,
+                'stream' => false,
             ],
         ])->willReturn($command);
 
@@ -511,7 +511,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
             '@http' => [
-                'stream' => true,
+                'stream' => false,
             ],
         ])->willReturn($command);
 
