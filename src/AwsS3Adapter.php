@@ -58,19 +58,26 @@ class AwsS3Adapter extends AbstractAdapter
     protected $options = [];
 
     /**
+     * @var bool
+     */
+    protected $stream = false;
+
+    /**
      * Constructor.
      *
      * @param S3Client $client
      * @param string   $bucket
      * @param string   $prefix
      * @param array    $options
+     * @param bool     $stream
      */
-    public function __construct(S3Client $client, $bucket, $prefix = '', array $options = [])
+    public function __construct(S3Client $client, $bucket, $prefix = '', array $options = [], $stream = false)
     {
         $this->s3Client = $client;
         $this->bucket = $bucket;
         $this->setPathPrefix($prefix);
         $this->options = $options;
+        $this->stream = $stream;
     }
 
     /**
@@ -432,7 +439,7 @@ class AwsS3Adapter extends AbstractAdapter
                 'Bucket' => $this->bucket,
                 'Key' => $this->applyPathPrefix($path),
                 '@http' => [
-                    'stream' => true,
+                    'stream' => $this->stream,
                 ],
             ]
         );
