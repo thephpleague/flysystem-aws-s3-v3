@@ -6,7 +6,6 @@ use Aws\Command;
 use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
-use GuzzleHttp\Promise;
 use GuzzleHttp\Psr7;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
@@ -120,9 +119,6 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
-            '@http' => [
-                'stream' => false,
-            ],
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow(S3Exception::class);
@@ -510,13 +506,37 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
-            '@http' => [
-                'stream' => false,
-            ],
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
         $this->{$method}($key)->shouldBeArray();
+    }
+
+    /**
+     * @param \Aws\CommandInterface $command
+     */
+    public function it_should_read_a_file_streaming($command)
+    {
+        $this->beConstructedWith($this->client, $this->bucket, self::PATH_PREFIX, [
+            '@http' => ['stream' => true],
+        ]);
+        $key = 'key.txt';
+        $stream = Psr7\stream_for('contents');
+        $result = new Result([
+            'Key' => self::PATH_PREFIX.'/'.$key,
+            'LastModified' => $date = date('Y-m-d h:i:s'),
+            'Body' => $stream,
+        ]);
+        $this->client->getCommand('getObject', [
+            'Bucket' => $this->bucket,
+            'Key' => self::PATH_PREFIX.'/'.$key,
+            '@http' => [
+                'stream' => true,
+            ],
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willReturn($result);
+        $this->readStream($key)->shouldBeArray();
     }
 
     private function make_it_write_using($method, $body)

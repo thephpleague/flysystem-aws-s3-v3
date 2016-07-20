@@ -58,26 +58,19 @@ class AwsS3Adapter extends AbstractAdapter
     protected $options = [];
 
     /**
-     * @var bool
-     */
-    protected $stream = false;
-
-    /**
      * Constructor.
      *
      * @param S3Client $client
      * @param string   $bucket
      * @param string   $prefix
      * @param array    $options
-     * @param bool     $stream
      */
-    public function __construct(S3Client $client, $bucket, $prefix = '', array $options = [], $stream = false)
+    public function __construct(S3Client $client, $bucket, $prefix = '', array $options = [])
     {
         $this->s3Client = $client;
         $this->bucket = $bucket;
         $this->setPathPrefix($prefix);
         $this->options = $options;
-        $this->stream = $stream;
     }
 
     /**
@@ -433,16 +426,16 @@ class AwsS3Adapter extends AbstractAdapter
      */
     protected function readObject($path)
     {
-        $command = $this->s3Client->getCommand(
-            'getObject',
-            [
-                'Bucket' => $this->bucket,
-                'Key' => $this->applyPathPrefix($path),
-                '@http' => [
-                    'stream' => $this->stream,
-                ],
-            ]
-        );
+        $options = [
+            'Bucket' => $this->bucket,
+            'Key' => $this->applyPathPrefix($path),
+        ];
+
+        if (isset($this->options['@http'])) {
+            $options['@http'] = $this->options['@http'];
+        }
+
+        $command = $this->s3Client->getCommand('getObject', $options);
 
         try {
             /** @var Result $response */
