@@ -38,6 +38,12 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->getBucket()->shouldBe('bucket');
     }
 
+    public function it_should_set_the_bucket()
+    {
+        $this->setBucket('newbucket');
+        $this->getBucket()->shouldBe('newbucket');
+    }
+
     public function it_should_retrieve_the_client()
     {
         $this->getClient()->shouldBe($this->client);
