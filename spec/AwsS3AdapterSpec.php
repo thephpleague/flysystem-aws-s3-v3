@@ -253,8 +253,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_copy_files($command, $aclCommand)
     {
-        $key = 'key.txt';
-        $sourceKey = 'newkey.txt';
+        $sourceKey = 'key.txt';
+        $key = 'newkey.txt';
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->make_it_copy_successfully($command, $key, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(true);
@@ -266,8 +266,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_return_false_when_copy_fails($command, $aclCommand)
     {
-        $key = 'key.txt';
-        $sourceKey = 'newkey.txt';
+        $sourceKey = 'key.txt';
+        $key = 'newkey.txt';
         $this->make_it_fail_on_copy($command, $key, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(false);
@@ -295,8 +295,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_return_false_during_rename_when_copy_fails($command, $aclCommand)
     {
-        $key = 'key.txt';
-        $sourceKey = 'newkey.txt';
+        $sourceKey = 'key.txt';
+        $key = 'newkey.txt';
         $this->make_it_fail_on_copy($command, $key, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->rename($sourceKey, $key)->shouldBe(false);
@@ -311,8 +311,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_copy_and_delete_during_renames($copyCommand, $deleteCommand, $aclCommand, $headCommand, $listCommand)
     {
-        $sourceKey = 'newkey.txt';
-        $key = 'key.txt';
+        $sourceKey = 'key.txt';
+        $key = 'newkey.txt';
 
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->make_it_copy_successfully($copyCommand, $key, $sourceKey, 'private');
