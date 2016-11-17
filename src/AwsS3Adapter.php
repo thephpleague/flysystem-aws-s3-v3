@@ -411,20 +411,6 @@ class AwsS3Adapter extends AbstractAdapter
     }
 
     /**
-     * Return an object's storage class.
-     *
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getStorageClass($path)
-    {
-        $metadata = $this->getMetadata($path);
-
-        return !empty($metadata['storage_class']) ? $metadata['storage_class'] : 'STANDARD';
-    }
-
-    /**
      * Read a file as a stream.
      *
      * @param string $path
@@ -692,5 +678,19 @@ class AwsS3Adapter extends AbstractAdapter
 
             throw $e;
         }
+    }
+
+    /**
+     * Return an object's storage class.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    protected function getStorageClass($path)
+    {
+        $metadata = $this->getMetadata($path);
+
+        return !empty($metadata['storage_class']) ? $metadata['storage_class'] : 'STANDARD';
     }
 }

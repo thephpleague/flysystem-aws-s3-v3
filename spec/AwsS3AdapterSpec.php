@@ -138,7 +138,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     public function it_should_retrieve_all_file_metadata($command)
     {
         $key = 'key.txt';
-        $this->mock_file_metadata($command, $key);
+        $this->make_it_retrieve_file_metadata($command, $key);
         $this->getMetadata($key)->shouldBeArray();
     }
 
@@ -148,7 +148,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     public function it_should_retrieve_the_timestamp_of_a_file($command)
     {
         $key = 'key.txt';
-        $this->mock_file_metadata($command, $key);
+        $this->make_it_retrieve_file_metadata($command, $key);
         $this->getTimestamp($key)->shouldBeArray();
     }
 
@@ -158,7 +158,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     public function it_should_retrieve_the_mimetype_of_a_file($command)
     {
         $key = 'key.txt';
-        $this->mock_file_metadata($command, $key);
+        $this->make_it_retrieve_file_metadata($command, $key);
         $this->getMimetype($key)->shouldBeArray();
     }
 
@@ -168,16 +168,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
     public function it_should_retrieve_the_size_of_a_file($command)
     {
         $key = 'key.txt';
-        $this->mock_file_metadata($command, $key);
+        $this->make_it_retrieve_file_metadata($command, $key);
         $this->getSize($key)->shouldBeArray();
-    }
-
-    /**
-     * @param \Aws\CommandInterface $command
-     */
-    public function it_should_retrieve_the_storage_class_of_a_file($command)
-    {
-        $this->make_it_retrieve_file_storage_class($command, 'key.txt');
     }
 
     /**
@@ -272,7 +264,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     {
         $sourceKey = 'key.txt';
         $key = 'newkey.txt';
-        $this->make_it_retrieve_file_storage_class($headCommand, $sourceKey);
+        $this->make_it_retrieve_file_metadata($headCommand, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->make_it_copy_successfully($command, $key, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(true);
@@ -288,7 +280,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $sourceKey = 'key.txt';
         $key = 'newkey.txt';
         $this->make_it_fail_on_copy($command, $key, $sourceKey);
-        $this->make_it_retrieve_file_storage_class($headCommand, $sourceKey);
+        $this->make_it_retrieve_file_metadata($headCommand, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(false);
     }
@@ -320,7 +312,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $key = 'newkey.txt';
         $this->make_it_fail_on_copy($command, $key, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
-        $this->make_it_retrieve_file_storage_class($headCommand, $sourceKey);
+        $this->make_it_retrieve_file_metadata($headCommand, $sourceKey);
         $this->rename($sourceKey, $key)->shouldBe(false);
     }
 
@@ -337,7 +329,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $key = 'newkey.txt';
 
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
-        $this->make_it_retrieve_file_storage_class($headCommand, $sourceKey);
+        $this->make_it_retrieve_file_metadata($headCommand, $sourceKey);
         $this->make_it_copy_successfully($copyCommand, $key, $sourceKey, 'private');
         $this->make_it_delete_successfully($deleteCommand, $sourceKey);
         $this->make_it_404_on_has_object($headCommand, $listCommand, $sourceKey);
@@ -503,7 +495,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->execute($command)->willReturn($result);
     }
 
-    private function mock_file_metadata($command, $key)
+    private function make_it_retrieve_file_metadata($command, $key)
     {
         $timestamp = time();
         $result = new Result([
@@ -519,12 +511,6 @@ class AwsS3AdapterSpec extends ObjectBehavior
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
-    }
-
-    private function make_it_retrieve_file_storage_class($command, $key)
-    {
-        $this->mock_file_metadata($command, $key);
-        $this->getStorageClass($key)->shouldBeString();
     }
 
     private function make_it_read_a_file($command, $method, $contents)
