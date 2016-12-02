@@ -562,7 +562,7 @@ class AwsS3Adapter extends AbstractAdapter
     {
         $key = $this->applyPathPrefix($path);
         $options = $this->getOptionsFromConfig($config);
-        $acl = isset($options['ACL']) ? $options['ACL'] : 'private';
+        $acl = array_key_exists($options['ACL']) ? $options['ACL'] : 'private';
 
         if ( ! isset($options['ContentType']) && is_string($body)) {
             $options['ContentType'] = Util::guessMimeType($path, $body);
