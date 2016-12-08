@@ -10,6 +10,9 @@ use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
+use League\Flysystem\Util\MimeType;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 
 class AwsS3Adapter extends AbstractAdapter
 {
@@ -564,8 +567,16 @@ class AwsS3Adapter extends AbstractAdapter
         $options = $this->getOptionsFromConfig($config);
         $acl = array_key_exists('ACL', $options) ? $options['ACL'] : 'private';
 
-        if ( ! isset($options['ContentType']) && is_string($body)) {
-            $options['ContentType'] = Util::guessMimeType($path, $body);
+        if (!isset($options['ContentType'])) {
+            if (is_string($body)) {
+                $options['ContentType'] = Util::guessMimeType($path, $body);
+            }
+            if (empty($options['ContentType'])) {
+                $extension = pathinfo($path, PATHINFO_EXTENSION);
+                if ($extension) {
+                    $options['ContentType'] = MimeType::detectByFileExtension($extension) ?: 'text/plain';
+                }
+            }
         }
 
         if ( ! isset($options['ContentLength'])) {
