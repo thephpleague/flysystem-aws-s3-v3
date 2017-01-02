@@ -564,7 +564,7 @@ class AwsS3Adapter extends AbstractAdapter
         $options = $this->getOptionsFromConfig($config);
         $acl = array_key_exists('ACL', $options) ? $options['ACL'] : 'private';
 
-        if ( ! isset($options['ContentType']) && is_string($body)) {
+        if ( ! isset($options['ContentType'])) {
             $options['ContentType'] = Util::guessMimeType($path, $body);
         }
 
