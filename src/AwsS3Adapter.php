@@ -500,9 +500,9 @@ class AwsS3Adapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function applyPathPrefix($prefix)
+    public function applyPathPrefix($path)
     {
-        return ltrim(parent::applyPathPrefix($prefix), '/');
+        return ltrim(parent::applyPathPrefix($path), '/');
     }
 
     /**
