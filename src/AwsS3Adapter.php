@@ -74,6 +74,20 @@ class AwsS3Adapter extends AbstractAdapter
     }
 
     /**
+     * Get the URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function getUrl($path)
+    {
+        if (isset($this->options['cloudfront'])) {
+            return $this->options['cloudfront'] . $path;
+        }
+        return $this->s3Client->getObjectUrl($this->bucket, $this->pathPrefix . $path);
+    }
+
+    /**
      * Get the S3Client bucket.
      *
      * @return string
