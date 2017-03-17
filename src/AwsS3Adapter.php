@@ -192,6 +192,25 @@ class AwsS3Adapter extends AbstractAdapter
     }
 
     /**
+     * Delete multiple objects from bucket.
+     *
+     * @param array $paths
+     *
+     * @return Result
+     */
+    public function deleteObjects($paths)
+    {
+        return $this->s3Client->deleteObjects([
+            'Bucket'  => $this->bucket,
+            'Delete' => [
+                'Objects' => array_map(function ($path) {
+                    return ['Key' => $this->applyPathPrefix($path)];
+                }, $paths)
+            ]
+        ]);
+    }
+
+    /**
      * Create a directory.
      *
      * @param string $dirname directory name
