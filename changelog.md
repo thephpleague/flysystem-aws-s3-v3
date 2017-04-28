@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.15 - 2017-04-28
+
+### Improved
+
+* Indicate this adapter can overwrite files.
+
 ## 1.0.14 - 2017-01-02
 
 ### Improved
