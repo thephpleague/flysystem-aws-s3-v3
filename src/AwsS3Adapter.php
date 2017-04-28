@@ -7,11 +7,12 @@ use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use League\Flysystem\Adapter\AbstractAdapter;
+use League\Flysystem\Adapter\CanOverwriteFiles;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 
-class AwsS3Adapter extends AbstractAdapter
+class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 {
     const PUBLIC_GRANT_URI = 'http://acs.amazonaws.com/groups/global/AllUsers';
 
