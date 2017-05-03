@@ -216,7 +216,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     {
         $location = $this->applyPathPrefix($path);
 
-        if ($this->s3Client->doesObjectExist($this->bucket, $location)) {
+        if ($this->s3Client->doesObjectExist($this->bucket, $location, $this->options)) {
             return true;
         }
 
@@ -446,7 +446,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
             $options['@http'] = $this->options['@http'];
         }
 
-        $command = $this->s3Client->getCommand('getObject', $options);
+        $command = $this->s3Client->getCommand('getObject', $options + $this->options);
 
         try {
             /** @var Result $response */
