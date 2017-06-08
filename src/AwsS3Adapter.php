@@ -40,6 +40,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         'ContentEncoding',
         'ContentDisposition',
         'ContentLength',
+        'Tagging',
         'WebsiteRedirectLocation',
         'SSEKMSKeyId'
     ];
