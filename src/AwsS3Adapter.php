@@ -265,6 +265,27 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 
         return Util::emulateDirectories($normalized);
     }
+    
+    /**
+     * Get presigned url
+     *
+     * @param string $path
+     * @param string $duration e.g. "+20 minutes"
+     *
+     * @return string
+     */
+    public function getPresignedUrl(string $path, string $duration)
+    {
+        $cmd = $this->s3Client->getCommand('GetObject', [
+            'Bucket' => $this->bucket,
+            'Key' => $path,
+        ]);
+
+        $request = $this->s3Client->createPresignedRequest($cmd, $duration);
+
+        // Get the actual presigned-url
+        return (string) $request->getUri();
+    }
 
     /**
      * @param array $options
