@@ -14,7 +14,7 @@
         "aws/aws-sdk-php": "^3.0.0"
     },
     "require-dev": {
-        "phpspec/phpspec": "^2.0.0",
+        "phpspec/phpspec": "^2.0.2",
         "henrikbjorn/phpspec-code-coverage" : "~1.0.1"
     },
     "autoload": {
