@@ -321,11 +321,17 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      *
      * @param string $path
      *
-     * @return false|array
+     * @return false|int
      */
     public function getSize($path)
     {
-        return $this->getMetadata($path);
+        $data = $this->getMetadata($path);
+
+        if (!$data) {
+            return false;
+        }
+
+        return $data['size'];
     }
 
     /**
@@ -333,11 +339,17 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      *
      * @param string $path
      *
-     * @return false|array
+     * @return false|string
      */
     public function getMimetype($path)
     {
-        return $this->getMetadata($path);
+        $data = $this->getMetadata($path);
+
+        if (!$data) {
+            return false;
+        }
+
+        return $data['mimetype'];
     }
 
     /**
@@ -345,11 +357,17 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      *
      * @param string $path
      *
-     * @return false|array
+     * @return false|int
      */
     public function getTimestamp($path)
     {
-        return $this->getMetadata($path);
+        $data = $this->getMetadata($path);
+
+        if (!$data) {
+            return false;
+        }
+
+        return $data['timestamp'];
     }
 
     /**

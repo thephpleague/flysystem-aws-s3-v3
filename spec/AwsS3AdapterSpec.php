@@ -137,7 +137,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_retrieve_all_file_metadata($command)
     {
-        $this->make_it_retrieve_file_metadata('getMetadata', $command);
+        $key = 'key.txt';
+        $this->mock_metadata($command, $key);
+        $this->getMetadata($key)->shouldBeArray();
     }
 
     /**
@@ -145,7 +147,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_retrieve_the_timestamp_of_a_file($command)
     {
-        $this->make_it_retrieve_file_metadata('getTimestamp', $command);
+        $key = 'key.txt';
+        $this->mock_metadata($command, $key);
+        $this->getTimestamp($key)->shouldBeInteger();
     }
 
     /**
@@ -153,7 +157,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_retrieve_the_mimetype_of_a_file($command)
     {
-        $this->make_it_retrieve_file_metadata('getMimetype', $command);
+        $key = 'key.txt';
+        $this->mock_metadata($command, $key);
+        $this->getMimetype($key)->shouldBeString();
     }
 
     /**
@@ -161,7 +167,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_retrieve_the_size_of_a_file($command)
     {
-        $this->make_it_retrieve_file_metadata('getSize', $command);
+        $key = 'key.txt';
+        $this->mock_metadata($command, $key);
+        $this->getSize($key)->shouldBeInteger();
     }
 
     /**
@@ -480,15 +488,15 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->execute($command)->willReturn($result);
     }
 
-    private function make_it_retrieve_file_metadata($method, $command)
+    private function mock_metadata($command, $key)
     {
         $timestamp = time();
-        $key = 'key.txt';
 
         $result = new Result([
             'Key' => self::PATH_PREFIX.'/'.$key,
             'LastModified' => date('Y-m-d H:i:s', $timestamp),
             'ContentType' => 'plain/text',
+            'ContentLength' => 128,
         ]);
 
         $this->client->getCommand('headObject', [
@@ -497,7 +505,6 @@ class AwsS3AdapterSpec extends ObjectBehavior
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
-        $this->{$method}($key)->shouldBeArray();
     }
 
     private function make_it_read_a_file($command, $method, $contents)
