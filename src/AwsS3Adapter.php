@@ -287,10 +287,11 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      * Get all the meta data of a file or directory.
      *
      * @param string $path
+     * @param bool $directory
      *
      * @return false|array
      */
-    public function getMetadata($path)
+    public function getMetadata($path, $directory = false)
     {
         $command = $this->s3Client->getCommand(
             'headObject',
@@ -304,6 +305,11 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         try {
             $result = $this->s3Client->execute($command);
         } catch (S3Exception $exception) {
+
+            if (!$directory) {
+                return $this->getMetadata($path . "/", true);
+            }
+
             $response = $exception->getResponse();
 
             if ($response !== null && $response->getStatusCode() === 404) {
