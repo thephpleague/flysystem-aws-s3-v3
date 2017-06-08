@@ -17,6 +17,16 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     const PUBLIC_GRANT_URI = 'http://acs.amazonaws.com/groups/global/AllUsers';
 
     /**
+     * @var bool
+     */
+    protected $putRequiresUpdate = false;
+
+    /**
+     * @var bool
+     */
+    protected $putStreamRequiresUpdate = false;
+
+    /**
      * @var array
      */
     protected static $resultMap = [
