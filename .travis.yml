@@ -7,15 +7,6 @@ php:
   - 7.0
   - 7.1
 
-matrix:
-  allow_failures:
-    - php: 7.0
-  fast_finish: true
-
-before_install:
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "7.0" ]; then rm phpspec.yml; fi;'
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "7.0" ]; then mv phpspec.no-coverage.yml phpspec.yml; fi;'
-
 install:
   - travis_retry composer install --no-interaction --prefer-source
 
@@ -23,5 +14,5 @@ script:
   - bin/phpspec run
 
 after_script:
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "7.0" ]; then wget https://scrutinizer-ci.com/ocular.phar; fi;'
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "7.0" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.xml; fi;'
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.xml
