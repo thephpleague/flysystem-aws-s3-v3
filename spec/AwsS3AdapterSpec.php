@@ -171,7 +171,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     {
         $key = 'key.txt';
         $result = new Result();
-        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(true);
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key, [])->willReturn(true);
 
         $this->has($key)->shouldBe(true);
     }
@@ -187,7 +187,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
                 'Key' => 'directory/foo.txt',
             ],
         ]);
-        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(false);
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key, [])->willReturn(false);
 
         $this->client->getCommand('listObjects', [
             'Bucket' => $this->bucket,
@@ -206,7 +206,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     public function it_should_return_false_when_listing_objects_returns_a_403($command, $exception)
     {
         $key = 'directory';
-        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(false);
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key, [])->willReturn(false);
 
         $this->client->getCommand('listObjects', [
             'Bucket' => $this->bucket,
@@ -610,7 +610,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
     private function make_it_404_on_has_object($headCommand, $listCommand, $key)
     {
-        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(false);
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key, [])->willReturn(false);
 
         $result = new Result();
         $this->client->getCommand('listObjects', [
