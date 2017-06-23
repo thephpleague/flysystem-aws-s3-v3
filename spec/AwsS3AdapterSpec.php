@@ -230,7 +230,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
     public function it_should_pass_through_when_listing_objects_throws_an_exception($command, $exception)
     {
         $key = 'directory';
-        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key)->willReturn(false);
+        $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key, [])->willReturn(false);
 
         $this->client->getCommand('listObjects', [
             'Bucket' => $this->bucket,
