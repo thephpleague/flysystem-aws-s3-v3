@@ -383,6 +383,22 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->deleteDir('prefix')->shouldBe(false);
     }
 
+    public function it_should_delete_objects()
+    {
+        $key = 'haha.txt';
+
+        $result = new Result();
+
+        $this->client->deleteObjects([
+            'Bucket'  => $this->bucket,
+            'Delete' => [
+                'Objects' => [
+                    'Key' => self::PATH_PREFIX.'/'.$key
+                ]
+            ]
+        ])->willReturn($result);
+    }
+
     /**
      * @param \Aws\CommandInterface $aclCommand
      */
