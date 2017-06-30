@@ -137,7 +137,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_retrieve_all_file_metadata($command)
     {
-        $this->make_it_retrieve_file_metadata('getMetadata', $command);
+        $key = 'key.txt';
+        $this->make_it_retrieve_file_metadata($command, $key);
+        $this->getMetadata($key)->shouldBeArray();
     }
 
     /**
@@ -145,7 +147,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_retrieve_the_timestamp_of_a_file($command)
     {
-        $this->make_it_retrieve_file_metadata('getTimestamp', $command);
+        $key = 'key.txt';
+        $this->make_it_retrieve_file_metadata($command, $key);
+        $this->getTimestamp($key)->shouldBeArray();
     }
 
     /**
@@ -153,7 +157,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_retrieve_the_mimetype_of_a_file($command)
     {
-        $this->make_it_retrieve_file_metadata('getMimetype', $command);
+        $key = 'key.txt';
+        $this->make_it_retrieve_file_metadata($command, $key);
+        $this->getMimetype($key)->shouldBeArray();
     }
 
     /**
@@ -161,7 +167,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_retrieve_the_size_of_a_file($command)
     {
-        $this->make_it_retrieve_file_metadata('getSize', $command);
+        $key = 'key.txt';
+        $this->make_it_retrieve_file_metadata($command, $key);
+        $this->getSize($key)->shouldBeArray();
     }
 
     /**
@@ -250,11 +258,13 @@ class AwsS3AdapterSpec extends ObjectBehavior
     /**
      * @param \Aws\CommandInterface $command
      * @param \Aws\CommandInterface $aclCommand
+     * @param \Aws\CommandInterface $headCommand
      */
-    public function it_should_copy_files($command, $aclCommand)
+    public function it_should_copy_files($command, $aclCommand, $headCommand)
     {
         $sourceKey = 'key.txt';
         $key = 'newkey.txt';
+        $this->make_it_retrieve_file_metadata($headCommand, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->make_it_copy_successfully($command, $key, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(true);
@@ -263,12 +273,14 @@ class AwsS3AdapterSpec extends ObjectBehavior
     /**
      * @param \Aws\CommandInterface $command
      * @param \Aws\CommandInterface $aclCommand
+     * @param \Aws\CommandInterface $headCommand
      */
-    public function it_should_return_false_when_copy_fails($command, $aclCommand)
+    public function it_should_return_false_when_copy_fails($command, $aclCommand, $headCommand)
     {
         $sourceKey = 'key.txt';
         $key = 'newkey.txt';
         $this->make_it_fail_on_copy($command, $key, $sourceKey);
+        $this->make_it_retrieve_file_metadata($headCommand, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(false);
     }
@@ -292,13 +304,15 @@ class AwsS3AdapterSpec extends ObjectBehavior
     /**
      * @param \Aws\CommandInterface $command
      * @param \Aws\CommandInterface $aclCommand
+     * @param \Aws\CommandInterface $headCommand
      */
-    public function it_should_return_false_during_rename_when_copy_fails($command, $aclCommand)
+    public function it_should_return_false_during_rename_when_copy_fails($command, $aclCommand, $headCommand)
     {
         $sourceKey = 'key.txt';
         $key = 'newkey.txt';
         $this->make_it_fail_on_copy($command, $key, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
+        $this->make_it_retrieve_file_metadata($headCommand, $sourceKey);
         $this->rename($sourceKey, $key)->shouldBe(false);
     }
 
@@ -315,6 +329,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $key = 'newkey.txt';
 
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
+        $this->make_it_retrieve_file_metadata($headCommand, $sourceKey);
         $this->make_it_copy_successfully($copyCommand, $key, $sourceKey, 'private');
         $this->make_it_delete_successfully($deleteCommand, $sourceKey);
         $this->make_it_404_on_has_object($headCommand, $listCommand, $sourceKey);
@@ -480,15 +495,14 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->execute($command)->willReturn($result);
     }
 
-    private function make_it_retrieve_file_metadata($method, $command)
+    private function make_it_retrieve_file_metadata($command, $key)
     {
         $timestamp = time();
-        $key = 'key.txt';
-
         $result = new Result([
             'Key' => self::PATH_PREFIX.'/'.$key,
             'LastModified' => date('Y-m-d H:i:s', $timestamp),
             'ContentType' => 'plain/text',
+            'StorageClass' => 'STANDARD',
         ]);
 
         $this->client->getCommand('headObject', [
@@ -497,7 +511,6 @@ class AwsS3AdapterSpec extends ObjectBehavior
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
-        $this->{$method}($key)->shouldBeArray();
     }
 
     private function make_it_read_a_file($command, $method, $contents)
@@ -567,6 +580,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'Key' => self::PATH_PREFIX.'/'.$key,
             'CopySource' => urlencode($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
             'ACL' => $acl,
+            'StorageClass' => 'STANDARD',
         ])->willReturn($copyCommand);
 
         $this->client->execute($copyCommand)->shouldBeCalled();
@@ -591,6 +605,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'Key' => self::PATH_PREFIX.'/'.$key,
             'CopySource' => urlencode($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
             'ACL' => 'private',
+            'StorageClass' => 'STANDARD',
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow(S3Exception::class);

@@ -24,6 +24,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         'ContentLength' => 'size',
         'ContentType' => 'mimetype',
         'Size' => 'size',
+        'StorageClass' => 'storage_class',
     ];
 
     /**
@@ -399,6 +400,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
                 'CopySource' => urlencode($this->bucket . '/' . $this->applyPathPrefix($path)),
                 'ACL' => $this->getRawVisibility($path) === AdapterInterface::VISIBILITY_PUBLIC
                     ? 'public-read' : 'private',
+                    'StorageClass' => $this->getStorageClass($path)
             ] + $this->options
         );
 
@@ -679,5 +681,19 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 
             throw $e;
         }
+    }
+
+    /**
+     * Return an object's storage class.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    protected function getStorageClass($path)
+    {
+        $metadata = $this->getMetadata($path);
+
+        return !empty($metadata['storage_class']) ? $metadata['storage_class'] : 'STANDARD';
     }
 }
