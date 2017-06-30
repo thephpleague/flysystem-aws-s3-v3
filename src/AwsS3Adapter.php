@@ -299,7 +299,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
             [
                 'Bucket' => $this->bucket,
                 'Key' => $this->applyPathPrefix($path),
-            ]
+            ] + $this->options
         );
 
         /* @var Result $result */
@@ -443,7 +443,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         $options = [
             'Bucket' => $this->bucket,
             'Key' => $this->applyPathPrefix($path),
-        ];
+        ] + $this->options;
 
         if (isset($this->options['@http'])) {
             $options['@http'] = $this->options['@http'];
