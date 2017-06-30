@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.18 - 2017-06-30
+
+### Fixed
+
+* Allow metadata to be returned through the getMetadata method.
+
 ## 1.0.17 - 2017-06-30
 
 ### Fixed
