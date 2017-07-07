@@ -362,7 +362,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('headObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
-        ])->willReturn($command);
+        ], [])->willReturn($command);
 
         $this->client->execute($command)->willThrow($exception);
         $this->shouldThrow($exception)->duringGetMetadata($key);
@@ -494,7 +494,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('headObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
-        ])->willReturn($command);
+        ], [])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
         $this->{$method}($key)->shouldBeArray();
@@ -632,7 +632,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('headObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
-        ])->willReturn($command);
+        ], [])->willReturn($command);
 
         $this->client->execute($command)->willThrow($exception);
     }
