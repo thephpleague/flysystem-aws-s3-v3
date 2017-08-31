@@ -31,19 +31,27 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      * @var array
      */
     protected static $metaOptions = [
-        'CacheControl',
-        'Expires',
-        'StorageClass',
-        'ServerSideEncryption',
-        'Metadata',
         'ACL',
-        'ContentType',
-        'ContentEncoding',
+        'CacheControl',
         'ContentDisposition',
+        'ContentEncoding',
         'ContentLength',
+        'ContentType',
+        'Expires',
+        'GrantFullControl',
+        'GrantRead',
+        'GrantReadACP',
+        'GrantWriteACP',
+        'Metadata',
+        'RequestPayer',
+        'SSECustomerAlgorithm',
+        'SSECustomerKey',
+        'SSECustomerKeyMD5',
+        'SSEKMSKeyId',
+        'ServerSideEncryption',
+        'StorageClass',
         'Tagging',
-        'WebsiteRedirectLocation',
-        'SSEKMSKeyId'
+        'WebsiteRedirectLocation'
     ];
 
     /**
