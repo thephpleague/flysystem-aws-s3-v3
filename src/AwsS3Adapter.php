@@ -25,6 +25,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         'ContentType' => 'mimetype',
         'Size' => 'size',
         'Metadata' => 'metadata',
+        'StorageClass' => 'storageclass',
     ];
 
     /**
