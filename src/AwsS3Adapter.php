@@ -650,6 +650,10 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
             $result['timestamp'] = strtotime($response['LastModified']);
         }
 
+        if (isset($response['ETag'])) {
+            $result['md5'] = substr($response['ETag'], 1, -1);
+        }
+
         if (substr($result['path'], -1) === '/') {
             $result['type'] = 'dir';
             $result['path'] = rtrim($result['path'], '/');
