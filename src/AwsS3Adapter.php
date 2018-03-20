@@ -317,7 +317,12 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         } catch (S3Exception $exception) {
             $response = $exception->getResponse();
 
-            if ($response !== null && $response->getStatusCode() === 404) {
+            if ($response !== null &&
+                (
+                    $response->getStatusCode() === 404 ||
+                    $response->getStatusCode() === 403
+                )
+            ) {
                 return false;
             }
 
