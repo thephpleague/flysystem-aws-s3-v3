@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.19 - 2018-01-26
+
+### Fixed
+
+* Allow get AWS S3 url to be returned through the getPresignedUrl method.
+
 ## 1.0.18 - 2017-06-30
 
 ### Fixed
