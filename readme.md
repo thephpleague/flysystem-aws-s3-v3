@@ -1,7 +1,7 @@
 # League\Flysystem\AwsS3v3
 
 [![Author](http://img.shields.io/badge/author-@frankdejonge-blue.svg?style=flat-square)](https://twitter.com/frankdejonge)
-[![Author]](https://www.e-time.it)
+[![Author](https://img.shields.io/badge/author-www.e--time.it-blue.svg?style=flat-square)](https://www.e-time.it)
 
 [![Build Status](https://img.shields.io/travis/sistemi-etime/flysystem-aws-s3-v3/master.svg?style=flat-square)](https://travis-ci.org/thephpleague/flysystem-aws-s3-v3)
 [![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/sistemi-etime/flysystem-aws-s3-v3.svg?style=flat-square)](https://scrutinizer-ci.com/g/sistemi-etime/flysystem-aws-s3-v3)
