@@ -370,7 +370,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
     public function it_should_delete_directories()
     {
-        $this->client->deleteMatchingObjects($this->bucket, self::PATH_PREFIX.'/'.'prefix/')->willReturn(null);
+        $this->client->deleteMatchingObjects($this->bucket, self::PATH_PREFIX.'/prefix/')->willReturn(null);
 
         $this->deleteDir('prefix')->shouldBe(true);
     }
@@ -489,6 +489,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'Key' => self::PATH_PREFIX.'/'.$key,
             'LastModified' => date('Y-m-d H:i:s', $timestamp),
             'ContentType' => 'plain/text',
+            'ETag' => '1234612346',
         ]);
 
         $this->client->getCommand('headObject', [
