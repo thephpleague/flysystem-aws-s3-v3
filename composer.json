@@ -1,11 +1,15 @@
 {
-    "name": "league/flysystem-aws-s3-v3",
+    "name": "sistemi-etime/flysystem-aws-s3-v3",
     "description": "Flysystem adapter for the AWS S3 SDK v3.x",
     "license": "MIT",
     "authors": [
         {
             "name": "Frank de Jonge",
             "email": "info@frenky.net"
+        },
+        {
+            "name": "Mauro Braggio",
+            "email": "m.braggio@e-time.it"
         }
     ],
     "require": {

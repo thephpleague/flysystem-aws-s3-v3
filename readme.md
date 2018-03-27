@@ -1,19 +1,24 @@
 # League\Flysystem\AwsS3v3
 
 [![Author](http://img.shields.io/badge/author-@frankdejonge-blue.svg?style=flat-square)](https://twitter.com/frankdejonge)
-[![Build Status](https://img.shields.io/travis/thephpleague/flysystem-aws-s3-v3/master.svg?style=flat-square)](https://travis-ci.org/thephpleague/flysystem-aws-s3-v3)
-[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/thephpleague/flysystem-aws-s3-v3.svg?style=flat-square)](https://scrutinizer-ci.com/g/thephpleague/flysystem-aws-s3-v3)
-[![Quality Score](https://img.shields.io/scrutinizer/g/thephpleague/flysystem-aws-s3-v3.svg?style=flat-square)](https://scrutinizer-ci.com/g/thephpleague/flysystem-aws-s3-v3)
+[![Author](https://img.shields.io/badge/author-www.e--time.it-blue.svg?style=flat-square)](https://www.e-time.it)
+
+[![Build Status](https://img.shields.io/travis/sistemi-etime/flysystem-aws-s3-v3/master.svg?style=flat-square)](https://travis-ci.org/sistemi-etime/flysystem-aws-s3-v3)
+[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/sistemi-etime/flysystem-aws-s3-v3.svg?style=flat-square)](https://scrutinizer-ci.com/g/sistemi-etime/flysystem-aws-s3-v3)
+[![Quality Score](https://img.shields.io/scrutinizer/g/sistemi-etime/flysystem-aws-s3-v3.svg?style=flat-square)](https://scrutinizer-ci.com/g/sistemi-etime/flysystem-aws-s3-v3)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
-[![Packagist Version](https://img.shields.io/packagist/v/league/flysystem-aws-s3-v3.svg?style=flat-square)](https://packagist.org/packages/league/flysystem-aws-s3-v3)
-[![Total Downloads](https://img.shields.io/packagist/dt/league/flysystem-aws-s3-v3.svg?style=flat-square)](https://packagist.org/packages/league/flysystem-aws-s3-v3)
+[![Packagist Version](https://img.shields.io/packagist/v/sistemi-etime/flysystem-aws-s3-v3.svg?style=flat-square)](https://packagist.org/packages/sistemi-etime/flysystem-aws-s3-v3)
+[![Total Downloads](https://img.shields.io/packagist/dt/sistemi-etime/flysystem-aws-s3-v3.svg?style=flat-square)](https://packagist.org/packages/sistemi-etime/flysystem-aws-s3-v3)
 
 This is a Flysystem adapter for the aws-sdk-php v3.
+
+# What's this
+This is a fork that add AWS S3 getPresignedUrl
 
 # Installation
 
 ```bash
-composer require league/flysystem-aws-s3-v3
+composer require sistemi-etime/flysystem-aws-s3-v3
 ```
 
 # Bootstrap
