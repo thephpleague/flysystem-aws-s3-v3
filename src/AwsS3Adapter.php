@@ -657,6 +657,17 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
             return $result;
         }
 
+        if (isset($response['ETag'])) {
+            $result['md5sum'] = $response['ETag'];
+        }
+
+        foreach (static::$metaOptions as $option) {
+            if ( ! isset($response[$option]) || empty($response[$option])) {
+                continue;
+            }
+            $result[$option] = $response[$option];
+        }
+
         return array_merge($result, Util::map($response, static::$resultMap), ['type' => 'file']);
     }
 
