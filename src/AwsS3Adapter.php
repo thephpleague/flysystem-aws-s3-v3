@@ -82,10 +82,10 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     public function __construct(S3Client $client, $bucket, $prefix = '', array $options = [])
     {
-        $this->s3Client = $client;
-        $this->bucket = $bucket;
-        $this->setPathPrefix($prefix);
-        $this->options = $options;
+        $this->s3Client($client)
+            ->setBucket($bucket)
+            ->setOptions($options)
+            ->setPathPrefix($prefix);
     }
 
     /**
@@ -101,11 +101,12 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     /**
      * Set the S3Client bucket.
      *
-     * @return string
+     * @return AwsS3Adapter
      */
     public function setBucket($bucket)
     {
         $this->bucket = $bucket;
+        return $this;
     }
 
     /**
@@ -116,6 +117,28 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     public function getClient()
     {
         return $this->s3Client;
+    }
+    
+    /**
+     * Set the S3Client.
+     *
+     * @return AwsS3Adapter
+     */
+    public function setClient($s3Client)
+    {
+        $this->s3Client = $s3Client;
+        return $this;
+    }
+    
+    /**
+     * Set the S3Client options.
+     *
+     * @return AwsS3Adapter
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
+        return $this;
     }
 
     /**
