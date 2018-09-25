@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.19 - 2018-03-27
+
+* Added ETAG to response mapping.
+
 ## 1.0.18 - 2017-06-30
 
 ### Fixed

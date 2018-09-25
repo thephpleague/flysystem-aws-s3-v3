@@ -8,7 +8,6 @@ extensions:
 formatter.name: pretty
 code_coverage:
   format:
-    - html
     - text
     - clover
   output:
