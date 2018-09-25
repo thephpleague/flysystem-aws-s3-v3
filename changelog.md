@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.19 - 2018-09-25
+
+* Fixed prefix handling for uploads (writes and updates).
+
 ## 1.0.19 - 2018-03-27
 
 * Added ETAG to response mapping.
