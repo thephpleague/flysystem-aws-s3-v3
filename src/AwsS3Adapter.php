@@ -593,7 +593,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 
         $this->s3Client->upload($this->bucket, $key, $body, $acl, ['params' => $options]);
 
-        return $this->normalizeResponse($options, $key);
+        return $this->normalizeResponse($options, $path);
     }
 
     /**
