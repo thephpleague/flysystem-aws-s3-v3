@@ -645,10 +645,8 @@ class AwsS3AdapterSpec extends ObjectBehavior
                 return in_array($value, $subject);
             },
             'haveItemWithKeyWithValue' => function($subject, $key, $value) {
-                foreach ($subject as $item)
-                {
-                    if (isset($item[$key]) && $item[$key] === $value)
-                    {
+                foreach ($subject as $item) {
+                    if (isset($item[$key]) && $item[$key] === $value) {
                         return true;
                     }
                 }
