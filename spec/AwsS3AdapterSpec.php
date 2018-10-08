@@ -462,6 +462,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
      */
     public function it_should_return_false_when_failing_to_upload($command)
     {
+        $config = new Config(['visibility' => 'public', 'mimetype' => 'plain/text', 'CacheControl' => 'value']);
         $key = 'key.txt';
         $this->client->upload(
             $this->bucket,
@@ -473,7 +474,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
 
         $this->client->execute($command)->willThrow(S3MultipartUploadException::class);
 
-        $this->write($key, 'contents')->shouldBe(false);
+        $this->write($key, 'contents', $config)->shouldBe(false);
     }
 
     /**
