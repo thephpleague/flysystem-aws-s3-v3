@@ -6,6 +6,7 @@ use Aws\Command;
 use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
+use Aws\S3\Exception\S3MultipartUploadException;
 use GuzzleHttp\Psr7;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
@@ -454,6 +455,25 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->execute($command)->willThrow(S3Exception::class);
 
         $this->setVisibility($key, 'private')->shouldBe(false);
+    }
+
+    /**
+     * @param \Aws\CommandInterface $command
+     */
+    public function it_should_return_false_when_failing_to_upload()
+    {
+        $config = new Config(['visibility' => 'public', 'mimetype' => 'plain/text', 'CacheControl' => 'value']);
+        $key = 'key.txt';
+        $this->client->upload(
+            $this->bucket,
+            self::PATH_PREFIX.'/'.$key,
+            'contents',
+            'public-read',
+            Argument::type('array')
+        )->willThrow(S3MultipartUploadException::class);
+
+
+        $this->write($key, 'contents', $config)->shouldBe(false);
     }
 
     /**
