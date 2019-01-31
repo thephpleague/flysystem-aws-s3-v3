@@ -13,6 +13,7 @@ install:
   - travis_retry composer install --no-interaction --prefer-source
 
 script:
+  - if [[ "${TRAVIS_PHP_VERSION}" == "7.3" ]]; then cp phpspec.no-coverage.yml phpspec.yml; fi
   - bin/phpspec run
 
 after_script:
