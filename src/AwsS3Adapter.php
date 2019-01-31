@@ -585,7 +585,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         }
 
         if ( ! isset($options['ContentLength'])) {
-            $options['ContentLength'] = is_string($body) ? Util::contentSize($body) : Util::getStreamSize($body);
+            $options['ContentLength'] = is_resource($body) ? Util::getStreamSize($body) : Util::contentSize($body);
         }
 
         if ($options['ContentLength'] === null) {
