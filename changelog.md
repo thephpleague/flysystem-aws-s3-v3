@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.22 - 2019-01-31
+
+* Invert type check where string/resource difference is determined for ContentLength option.
+
 ## 1.0.21 - 2018-10-08
 
 * Catch multipart upload errors.
