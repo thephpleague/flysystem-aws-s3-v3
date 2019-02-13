@@ -580,16 +580,18 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         $options = $this->getOptionsFromConfig($config);
         $acl = array_key_exists('ACL', $options) ? $options['ACL'] : 'private';
 
-        if ( ! isset($options['ContentType'])) {
-            $options['ContentType'] = Util::guessMimeType($path, $body);
-        }
+        if (!$this->isOnlyDir($path)) {
+            if ( ! isset($options['ContentType'])) {
+                $options['ContentType'] = Util::guessMimeType($path, $body);
+            }
 
-        if ( ! isset($options['ContentLength'])) {
-            $options['ContentLength'] = is_resource($body) ? Util::getStreamSize($body) : Util::contentSize($body);
-        }
+            if ( ! isset($options['ContentLength'])) {
+                $options['ContentLength'] = is_resource($body) ? Util::getStreamSize($body) : Util::contentSize($body);
+            }
 
-        if ($options['ContentLength'] === null) {
-            unset($options['ContentLength']);
+            if ($options['ContentLength'] === null) {
+                unset($options['ContentLength']);
+            }
         }
 
         try {
@@ -599,6 +601,17 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         }
 
         return $this->normalizeResponse($options, $path);
+    }
+
+    /**
+     * Check if the path contains only directories
+     *
+     * @param string $path
+     * @return bool
+     */
+    private function isOnlyDir($path)
+    {
+        return substr($path, -1) === '/';
     }
 
     /**
@@ -657,7 +670,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
             $result['timestamp'] = strtotime($response['LastModified']);
         }
 
-        if (substr($result['path'], -1) === '/') {
+        if ($this->isOnlyDir($result['path'])) {
             $result['type'] = 'dir';
             $result['path'] = rtrim($result['path'], '/');
 
