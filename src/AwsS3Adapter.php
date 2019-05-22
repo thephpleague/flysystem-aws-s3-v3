@@ -409,7 +409,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
             [
                 'Bucket'     => $this->bucket,
                 'Key'        => $this->applyPathPrefix($newpath),
-                'CopySource' => urlencode($this->bucket . '/' . $this->applyPathPrefix($path)),
+                'CopySource' => rawurlencode($this->bucket . '/' . $this->applyPathPrefix($path)),
                 'ACL'        => $this->getRawVisibility($path) === AdapterInterface::VISIBILITY_PUBLIC
                     ? 'public-read' : 'private',
             ] + $this->options
