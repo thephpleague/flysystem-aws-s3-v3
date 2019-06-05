@@ -318,9 +318,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         try {
             $result = $this->s3Client->execute($command);
         } catch (S3Exception $exception) {
-            $response = $exception->getResponse();
-
-            if ($response !== null && $response->getStatusCode() === 404) {
+            if ($this->is404Exception($exception)) {
                 return false;
             }
 
@@ -328,6 +326,20 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         }
 
         return $this->normalizeResponse($result->toArray(), $path);
+    }
+
+    /**
+     * @return bool
+     */
+    private function is404Exception(S3Exception $exception)
+    {
+        $response = $exception->getResponse();
+
+        if ($response !== null && $response->getStatusCode() === 404) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
