@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.23 - 2019-06-05
+
+* Prevent content type detection for directory creation.
+* Use `rawurlencode` instead of `urlencode` to treat url encoding in a spec compliant way.
+
 ## 1.0.22 - 2019-01-31
 
 * Invert type check where string/resource difference is determined for ContentLength option.
