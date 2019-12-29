@@ -458,7 +458,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     /**
      * Read an object and normalize the response.
      *
-     * @param $path
+     * @param string $path
      *
      * @return array|bool
      */
@@ -580,9 +580,9 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     /**
      * Upload an object.
      *
-     * @param        $path
-     * @param        $body
-     * @param Config $config
+     * @param string          $path
+     * @param string|resource $body
+     * @param Config          $config
      *
      * @return array|bool
      */
@@ -619,6 +619,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      * Check if the path contains only directories
      *
      * @param string $path
+     *
      * @return bool
      */
     private function isOnlyDir($path)
@@ -693,7 +694,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     }
 
     /**
-     * @param $location
+     * @param string $location
      *
      * @return bool
      */
