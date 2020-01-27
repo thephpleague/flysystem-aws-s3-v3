@@ -592,6 +592,12 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         $options = $this->getOptionsFromConfig($config);
         $acl = array_key_exists('ACL', $options) ? $options['ACL'] : 'private';
 
+        /* Ensure directory components exist */
+        $directory = Util::dirname($path);
+        if ($directory !== '') {
+            $this->createDir($directory, $config);
+        }
+
         if (!$this->isOnlyDir($path)) {
             if ( ! isset($options['ContentType'])) {
                 $options['ContentType'] = Util::guessMimeType($path, $body);
@@ -604,6 +610,8 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
             if ($options['ContentLength'] === null) {
                 unset($options['ContentLength']);
             }
+        } else {
+            $options['ContentType'] = "application/x-directory";
         }
 
         try {
