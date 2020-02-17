@@ -16,6 +16,7 @@ use League\Flysystem\Util;
 class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 {
     const PUBLIC_GRANT_URI = 'http://acs.amazonaws.com/groups/global/AllUsers';
+    const S3_UPLOAD_PART_SIZE = 524288000;
 
     /**
      * @var array
@@ -607,7 +608,11 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         }
 
         try {
-            $this->s3Client->upload($this->bucket, $key, $body, $acl, ['params' => $options]);
+            $this->s3Client->upload($this->bucket, $key, $body, $acl, [
+                'params' => $options,
+                'mup_threshold' => self::S3_UPLOAD_PART_SIZE,
+                'part_size' => self::S3_UPLOAD_PART_SIZE
+            ]);
         } catch (S3MultipartUploadException $multipartUploadException) {
             return false;
         }
