@@ -18,6 +18,8 @@ composer require league/flysystem-aws-s3-v3
 
 # Bootstrap
 
+Using standard `Aws\S3\S3Client`:
+
 ``` php
 <?php
 use Aws\S3\S3Client;
@@ -32,6 +34,28 @@ $client = new S3Client([
         'secret' => 'your-secret'
     ],
     'region' => 'your-region',
+    'version' => 'latest|version',
+]);
+
+$adapter = new AwsS3Adapter($client, 'your-bucket-name');
+$filesystem = new Filesystem($adapter);
+```
+
+or using `Aws\S3\S3MultiRegionClient` which does not require to specify the `region` parameter:
+
+``` php
+<?php
+use Aws\S3\S3MultiRegionClient;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Filesystem;
+
+include __DIR__ . '/vendor/autoload.php';
+
+$client = new S3MultiRegionClient([
+    'credentials' => [
+        'key'    => 'your-key',
+        'secret' => 'your-secret'
+    ],
     'version' => 'latest|version',
 ]);
 
