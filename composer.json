@@ -1,0 +1,24 @@
+{
+    "name": "league/flysystem-aws-s3-v3",
+    "description": "AWS S3 filesystem adapter for Flysystem.",
+    "type": "library",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "League\\Flysystem\\AwsS3V3\\": ""
+        }
+    },
+    "require": {
+        "php": "^7.2",
+        "league/flystem": "2.x-dev",
+        "aws/aws-sdk-php": "^3.132.4"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Frank de Jonge",
+            "email": "info@frankdejonge.nl"
+        }
+    ]
+}
