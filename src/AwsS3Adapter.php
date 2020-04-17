@@ -674,7 +674,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     {
         $result = [
             'path' => $path ?: $this->removePathPrefix(
-                isset($response['Key']) ? $response['Key'] : $response['Prefix']
+                isset($response['Key']) ? urldecode($response['Key']) : urldecode($response['Prefix'])
             ),
         ];
         $result = array_merge($result, Util::pathinfo($result['path']));
