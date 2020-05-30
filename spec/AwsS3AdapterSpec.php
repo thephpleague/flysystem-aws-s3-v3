@@ -7,6 +7,7 @@ use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\Exception\S3MultipartUploadException;
+use Aws\S3\S3Client;
 use GuzzleHttp\Psr7;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
@@ -624,7 +625,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('copyObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
-            'CopySource' => urlencode($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
+            'CopySource' => S3Client::encodeKey($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
             'ACL' => $acl,
         ])->willReturn($copyCommand);
 
@@ -648,7 +649,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('copyObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
-            'CopySource' => urlencode($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
+            'CopySource' => S3Client::encodeKey($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
             'ACL' => 'private',
         ])->willReturn($command);
 

@@ -6,6 +6,7 @@ use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\Exception\S3MultipartUploadException;
+use Aws\S3\S3Client;
 use Aws\S3\S3ClientInterface;
 use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Adapter\CanOverwriteFiles;
@@ -421,7 +422,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
             [
                 'Bucket'     => $this->bucket,
                 'Key'        => $this->applyPathPrefix($newpath),
-                'CopySource' => rawurlencode($this->bucket . '/' . $this->applyPathPrefix($path)),
+                'CopySource' => S3Client::encodeKey($this->bucket . '/' . $this->applyPathPrefix($path)),
                 'ACL'        => $this->getRawVisibility($path) === AdapterInterface::VISIBILITY_PUBLIC
                     ? 'public-read' : 'private',
             ] + $this->options
