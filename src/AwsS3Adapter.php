@@ -8,9 +8,9 @@ use Aws\S3\Exception\S3Exception;
 use Aws\S3\Exception\S3MultipartUploadException;
 use Aws\S3\S3Client;
 use Aws\S3\S3ClientInterface;
+use League\Flysystem\AdapterInterface;
 use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Adapter\CanOverwriteFiles;
-use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 
