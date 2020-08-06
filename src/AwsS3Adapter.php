@@ -717,7 +717,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 
             return $result['Contents'] || $result['CommonPrefixes'];
         } catch (S3Exception $e) {
-            if ($e->getStatusCode() === 403) {
+            if (in_array($e->getStatusCode(), [403, 404], true)) {
                 return false;
             }
 
