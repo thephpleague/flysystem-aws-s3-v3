@@ -6,6 +6,8 @@ use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
+use Aws\CloudFront\UrlSigner;
+
 use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Adapter\CanOverwriteFiles;
 use League\Flysystem\AdapterInterface;
@@ -420,6 +422,36 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         }
 
         return true;
+    }
+
+    /**
+     * Get a CloudFront URL for the file at the given path.
+     *
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  array $options
+     * @return string
+     */
+    public function getCloudFrontUrl($path, $expiration, array $options = [])
+    {
+        $cloudfront_options = [
+            'endpoint', 'key_pair_id', 'private_key'
+        ];
+
+        $options = array_merge($options, $this->options);
+
+        if (count(array_intersect_key(array_flip($cloudfront_options), $options)) === count($cloudfront_options)) {
+            $urlSigner = new UrlSigner(
+                $options['key_pair_id'],
+                $options['private_key']
+            );
+
+            return $urlSigner->getSignedUrl(
+                rtrim($options['endpoint'], '/').'/'.ltrim($path, '/'),
+                $expiration->getTimestamp(),
+                $options['policy'] ?? null
+            );
+        }
     }
 
     /**
