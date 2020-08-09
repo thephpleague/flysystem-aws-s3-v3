@@ -38,3 +38,13 @@ $client = new S3Client([
 $adapter = new AwsS3Adapter($client, 'your-bucket-name');
 $filesystem = new Filesystem($adapter);
 ```
+
+# Support for CloudFront URL
+```
+$filesystem->getCloudFrontUrl('file.txt', new DateTime('+ 3 days'));
+```
+
+# Support for temporary Url
+```
+$filesystem->getTemporaryUrl('file.txt', new DateTime('+ 3 days'));
+```
