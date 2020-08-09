@@ -54,6 +54,15 @@ $adapter = new AwsS3Adapter($client, 'your-bucket-name');
 $filesystem = new Filesystem($adapter);
 ```
 
+# CloudFront Configuration Options
+```
+'options' => [
+    'endpoint' => 'https://xxxxxxxxxxx.cloudfront.net',
+    'private_key' => 'private_key',
+    'key_pair_id' => 'key_pair_id',
+]
+```
+
 # Support for CloudFront URL
 ```
 $filesystem->getCloudFrontUrl('file.txt', new DateTime('+ 3 days'));
