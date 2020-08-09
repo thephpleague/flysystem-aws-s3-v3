@@ -455,6 +455,32 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     }
 
     /**
+     * Get a temporary URL for the file at the given path.
+     *
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  array $options
+     * @return string
+     */
+    public function getTemporaryUrl($path, $expiration, array $options = [])
+    {
+        $cloudfront_url = $this->getCloudFrontUrl($path, $expiration, $options);
+
+        if ($cloudfront_url) {
+            return $cloudfront_url;
+        }
+
+        $command = $this->s3Client->getCommand('GetObject', array_merge([
+            'Bucket' => $this->getBucket(),
+            'Key' => $this->getPathPrefix().$path,
+        ], $options));
+
+        return (string) $this->s3Client->createPresignedRequest(
+            $command, $expiration
+        )->getUri();
+    }
+
+    /**
      * Read a file as a stream.
      *
      * @param string $path
