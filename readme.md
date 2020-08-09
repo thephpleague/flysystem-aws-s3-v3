@@ -10,10 +10,25 @@
 
 This is a Flysystem adapter for the aws-sdk-php v3.
 
+# Add the repository label to your composer.json
+```
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/rankarpan/flysystem-aws-s3-v3"
+        }
+    ],
+    "require": {
+        "league/flysystem-aws-s3-v3": "dev-cloudfront-v1.x"
+    }
+}
+```
+
 # Installation
 
 ```bash
-composer require league/flysystem-aws-s3-v3
+composer require league/flysystem-aws-s3-v3:dev-cloudfront-v1.x
 ```
 
 # Bootstrap
@@ -44,7 +59,7 @@ $filesystem = new Filesystem($adapter);
 $filesystem->getCloudFrontUrl('file.txt', new DateTime('+ 3 days'));
 ```
 
-# Support for temporary Url
+# Support for temporary URL
 ```
 $filesystem->getTemporaryUrl('file.txt', new DateTime('+ 3 days'));
 ```
