@@ -440,7 +440,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 
         $options = array_merge($options, $this->options);
 
-        if (count(array_intersect_key(array_flip($cloudfront_options), $options)) === count($cloudfront_options)) {
+        if (count(array_intersect_key(array_flip($cloudfront_options), $options)) === count($cloudfront_options) && count(array_filter($options)) === count($cloudfront_options)) {
             $urlSigner = new UrlSigner(
                 $options['key_pair_id'],
                 $options['private_key']
