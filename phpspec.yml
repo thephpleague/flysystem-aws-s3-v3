@@ -1,14 +1,13 @@
 ---
 suites:
-      event_suite:
-        namespace: League\Flysystem\AwsS3v3
-        psr4_prefix: League\Flysystem\AwsS3v3
+  event_suite:
+    namespace: League\Flysystem\AwsS3v3
+    psr4_prefix: League\Flysystem\AwsS3v3
 extensions:
   - PhpSpec\Extension\CodeCoverageExtension
 formatter.name: pretty
 code_coverage:
   format:
-    - html
     - text
     - clover
   output:
