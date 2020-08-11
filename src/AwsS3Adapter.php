@@ -464,7 +464,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
             return $urlSigner->getSignedUrl(
                 rtrim($options['endpoint'], '/').'/'.ltrim($path, '/'),
                 $expiration->getTimestamp(),
-                $options['policy'] ?? null
+                isset($options['policy']) ? $options['policy'] : null
             );
         }
     }
