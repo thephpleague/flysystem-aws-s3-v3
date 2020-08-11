@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.26 - 2020-08-11
+
+* Support for CloudFront URL.
+* Support for Temporary Signed URL.
+
 ## 1.0.25 - 2020-06-02
 
 * Use `S3Client::encodeKey` for key encoding.
