@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.25 - 2020-06-02
+
+* Use `S3Client::encodeKey` for key encoding.
+
 ## 1.0.24 - 2020-02-23
 
 * Depend on S3ClientInterface rather than the concrete client.
