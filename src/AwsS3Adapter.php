@@ -455,7 +455,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 
         return $response;
     }
-  
+
   /**
    * Read an object and normalize the response.
    *
