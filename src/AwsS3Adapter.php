@@ -248,7 +248,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     public function read($path)
     {
-        $response = $this->readObject($path,false);
+        $response = $this->readObject($path, false);
 
         if ($response !== false) {
             $response['contents'] = $response['contents']->getContents();
