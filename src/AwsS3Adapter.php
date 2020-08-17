@@ -248,7 +248,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     public function read($path)
     {
-        $response = $this->readObject($path);
+        $response = $this->readObject($path,false);
 
         if ($response !== false) {
             $response['contents'] = $response['contents']->getContents();
@@ -446,7 +446,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     public function readStream($path)
     {
-        $response = $this->readObject($path);
+        $response = $this->readObject($path, true);
 
         if ($response !== false) {
             $response['stream'] = $response['contents']->detach();
@@ -455,20 +455,24 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 
         return $response;
     }
-
-    /**
-     * Read an object and normalize the response.
-     *
-     * @param string $path
-     *
-     * @return array|bool
-     */
-    protected function readObject($path)
+	
+	/**
+	 * Read an object and normalize the response.
+	 *
+	 * @param string $path
+	 * @param bool   $stream
+	 * @return array|bool
+	 */
+    protected function readObject($path, $stream)
     {
         $options = [
             'Bucket' => $this->bucket,
             'Key'    => $this->applyPathPrefix($path),
         ];
+        
+        if ($stream) {
+        	$options['@http']['stream'] = true;
+        }
 
         if (isset($this->options['@http'])) {
             $options['@http'] = $this->options['@http'];
