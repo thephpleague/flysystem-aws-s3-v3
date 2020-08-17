@@ -463,7 +463,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
    * @param bool   $stream
    * @return array|bool
    */
-    protected function readObject($path, $stream)
+    protected function readObject($path, $stream = true)
     {
         $options = [
             'Bucket' => $this->bucket,
