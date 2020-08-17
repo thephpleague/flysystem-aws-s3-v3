@@ -455,14 +455,14 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
 
         return $response;
     }
-	
-	/**
-	 * Read an object and normalize the response.
-	 *
-	 * @param string $path
-	 * @param bool   $stream
-	 * @return array|bool
-	 */
+  
+  /**
+   * Read an object and normalize the response.
+   *
+   * @param string $path
+   * @param bool   $stream
+   * @return array|bool
+   */
     protected function readObject($path, $stream)
     {
         $options = [
