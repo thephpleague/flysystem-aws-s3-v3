@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.26 - 2020-07-18
+
+* Always stream reads (#211)
+
 ## 1.0.25 - 2020-06-02
 
 * Use `S3Client::encodeKey` for key encoding.
