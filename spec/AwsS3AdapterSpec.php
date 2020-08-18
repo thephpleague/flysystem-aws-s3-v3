@@ -569,10 +569,16 @@ class AwsS3AdapterSpec extends ObjectBehavior
             'LastModified' => $date = date('Y-m-d h:i:s'),
             'Body' => $stream,
         ]);
-        $this->client->getCommand('getObject', [
-            'Bucket' => $this->bucket,
-            'Key' => self::PATH_PREFIX.'/'.$key,
-        ])->willReturn($command);
+	    $config = [
+		    'Bucket' => $this->bucket,
+		    'Key'    => self::PATH_PREFIX.'/'.$key,
+	    ];
+	    
+	    if ($method === 'readStream') {
+	    	$config['@http'] = ['stream' => true];
+	    }
+	    
+	    $this->client->getCommand('getObject', $config)->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
         $this->{$method}($key)->shouldBeArray();
