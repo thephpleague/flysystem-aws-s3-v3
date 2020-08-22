@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.27 - 2020-08-22
+
+* Revert always streaming reads (degraded functionality).
+
 ## 1.0.26 - 2020-08-18
 
 * Always stream reads (#211)
