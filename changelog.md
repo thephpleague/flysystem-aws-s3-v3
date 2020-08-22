@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.28 - 2020-08-22
+
+* Allow to stream by default.
+
 ## 1.0.27 - 2020-08-22
 
 * Revert always streaming reads (degraded functionality).
