@@ -75,19 +75,17 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
     protected $options = [];
 
     /**
-     * Constructor.
-     *
-     * @param S3ClientInterface $client
-     * @param string   $bucket
-     * @param string   $prefix
-     * @param array    $options
+     * @var bool
      */
-    public function __construct(S3ClientInterface $client, $bucket, $prefix = '', array $options = [])
+    private $streamReads;
+
+    public function __construct(S3ClientInterface $client, $bucket, $prefix = '', array $options = [], bool $streamReads = true)
     {
         $this->s3Client = $client;
         $this->bucket = $bucket;
         $this->setPathPrefix($prefix);
         $this->options = $options;
+        $this->streamReads = $streamReads;
     }
 
     /**
@@ -468,10 +466,10 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         $options = [
             'Bucket' => $this->bucket,
             'Key'    => $this->applyPathPrefix($path),
-        ];
+        ] + $this->options;
 
-        if (isset($this->options['@http'])) {
-            $options['@http'] = $this->options['@http'];
+        if ($this->streamReads && ! isset($options['@http']['stream'])) {
+            $options['@http']['stream'] = true;
         }
 
         $command = $this->s3Client->getCommand('getObject', $options + $this->options);

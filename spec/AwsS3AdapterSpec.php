@@ -127,6 +127,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
+            '@http' => [
+                'stream' => true,
+            ]
         ])->willReturn($command);
 
         $this->client->execute($command)->willThrow(S3Exception::class);
@@ -572,6 +575,9 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->getCommand('getObject', [
             'Bucket' => $this->bucket,
             'Key' => self::PATH_PREFIX.'/'.$key,
+            '@http' => [
+                'stream' => true,
+            ]
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
@@ -599,6 +605,55 @@ class AwsS3AdapterSpec extends ObjectBehavior
             '@http' => [
                 'stream' => true,
             ],
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willReturn($result);
+        $this->readStream($key)->shouldBeArray();
+    }
+
+    /**
+     * @param \Aws\CommandInterface $command
+     */
+    public function it_should_read_a_file_not_streaming_when_http_stream_is_false($command)
+    {
+        $this->beConstructedWith($this->client, $this->bucket, self::PATH_PREFIX, [
+            '@http' => ['stream' => false],
+        ]);
+        $key = 'key.txt';
+        $stream = Psr7\stream_for('contents');
+        $result = new Result([
+            'Key' => self::PATH_PREFIX.'/'.$key,
+            'LastModified' => $date = date('Y-m-d h:i:s'),
+            'Body' => $stream,
+        ]);
+        $this->client->getCommand('getObject', [
+            'Bucket' => $this->bucket,
+            'Key' => self::PATH_PREFIX.'/'.$key,
+            '@http' => [
+                'stream' => false,
+            ],
+        ])->willReturn($command);
+
+        $this->client->execute($command)->willReturn($result);
+        $this->readStream($key)->shouldBeArray();
+    }
+
+    /**
+     * @param \Aws\CommandInterface $command
+     */
+    public function it_should_read_a_file_not_streaming_when_streamReads_is_false($command)
+    {
+        $this->beConstructedWith($this->client, $this->bucket, self::PATH_PREFIX, [], false);
+        $key = 'key.txt';
+        $stream = Psr7\stream_for('contents');
+        $result = new Result([
+            'Key' => self::PATH_PREFIX.'/'.$key,
+            'LastModified' => $date = date('Y-m-d h:i:s'),
+            'Body' => $stream,
+        ]);
+        $this->client->getCommand('getObject', [
+            'Bucket' => $this->bucket,
+            'Key' => self::PATH_PREFIX.'/'.$key,
         ])->willReturn($command);
 
         $this->client->execute($command)->willReturn($result);
