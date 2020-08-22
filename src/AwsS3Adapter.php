@@ -79,7 +79,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     private $streamReads;
 
-    public function __construct(S3ClientInterface $client, $bucket, $prefix = '', array $options = [], bool $streamReads = true)
+    public function __construct(S3ClientInterface $client, $bucket, $prefix = '', array $options = [], $streamReads = true)
     {
         $this->s3Client = $client;
         $this->bucket = $bucket;
