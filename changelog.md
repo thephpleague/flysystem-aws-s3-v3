@@ -2,7 +2,10 @@
 
 ## 1.0.28 - 2020-08-22
 
-* Allow to stream by default.
+* __Allow streamed read by default.__<br/>
+  This change prevents the stream from being seekable (func
+  calls like rewind have no effect). Need to seek through the stream?
+  Check out the docs to see how to disable streaming read: https://flysystem.thephpleague.com/v1/docs/adapter/aws-s3-v3/#streamed-reads 
 
 ## 1.0.27 - 2020-08-22
 
