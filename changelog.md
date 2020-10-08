@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.29 - 2020-10-08
+
+* copies now switch to multipart copy for large files.
+
 ## 1.0.28 - 2020-08-22
 
 * __Allow streamed read by default.__<br/>
