@@ -261,19 +261,18 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $sourceKey = 'key.txt';
         $key = 'newkey.txt';
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
-        $this->make_it_copy_successfully($command, $key, $sourceKey, 'private');
+        $this->make_it_copy_successfully($key, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(true);
     }
 
     /**
-     * @param \Aws\CommandInterface $command
      * @param \Aws\CommandInterface $aclCommand
      */
-    public function it_should_return_false_when_copy_fails($command, $aclCommand)
+    public function it_should_return_false_when_copy_fails($aclCommand)
     {
         $sourceKey = 'key.txt';
         $key = 'newkey.txt';
-        $this->make_it_fail_on_copy($command, $key, $sourceKey);
+        $this->make_it_fail_on_copy($key, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
         $this->copy($sourceKey, $key)->shouldBe(false);
     }
@@ -295,15 +294,14 @@ class AwsS3AdapterSpec extends ObjectBehavior
     }
 
     /**
-     * @param \Aws\CommandInterface $command
      * @param \Aws\CommandInterface $aclCommand
      */
-    public function it_should_return_false_during_rename_when_copy_fails($command, $aclCommand)
+    public function it_should_return_false_during_rename_when_copy_fails($aclCommand)
     {
         $sourceKey = 'key.txt';
         $key = 'newkey.txt';
-        $this->make_it_fail_on_copy($command, $key, $sourceKey);
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
+        $this->make_it_fail_on_copy($key, $sourceKey);
         $this->rename($sourceKey, $key)->shouldBe(false);
     }
 
@@ -320,7 +318,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $key = 'newkey.txt';
 
         $this->make_it_retrieve_raw_visibility($aclCommand, $sourceKey, 'private');
-        $this->make_it_copy_successfully($copyCommand, $key, $sourceKey, 'private');
+        $this->make_it_copy_successfully($key, $sourceKey, 'private');
         $this->make_it_delete_successfully($deleteCommand, $sourceKey);
         $this->make_it_404_on_has_object($headCommand, $listCommand, $sourceKey);
         $this->rename($sourceKey, $key)->shouldBe(true);
@@ -675,16 +673,16 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->{$method}($key, $body, $config)->shouldBeArray();
     }
 
-    private function make_it_copy_successfully($copyCommand, $key, $sourceKey, $acl)
+    private function make_it_copy_successfully($key, $sourceKey, $acl)
     {
-        $this->client->getCommand('copyObject', [
-            'Bucket' => $this->bucket,
-            'Key' => self::PATH_PREFIX.'/'.$key,
-            'CopySource' => S3Client::encodeKey($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
-            'ACL' => $acl,
-        ])->willReturn($copyCommand);
-
-        $this->client->execute($copyCommand)->shouldBeCalled();
+        $this->client->copy(
+            $this->bucket,
+            self::PATH_PREFIX.'/'.$sourceKey,
+            $this->bucket,
+            self::PATH_PREFIX.'/'.$key,
+            $acl,
+            []
+        )->shouldBeCalled();
     }
 
     private function make_it_delete_successfully($deleteCommand, $sourceKey)
@@ -699,16 +697,16 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->execute($deleteCommand)->willReturn($deleteResult);
     }
 
-    private function make_it_fail_on_copy($command, $key, $sourceKey)
+    private function make_it_fail_on_copy($key, $sourceKey)
     {
-        $this->client->getCommand('copyObject', [
-            'Bucket' => $this->bucket,
-            'Key' => self::PATH_PREFIX.'/'.$key,
-            'CopySource' => S3Client::encodeKey($this->bucket.'/'.self::PATH_PREFIX.'/'.$sourceKey),
-            'ACL' => 'private',
-        ])->willReturn($command);
-
-        $this->client->execute($command)->willThrow(S3Exception::class);
+        $this->client->copy(
+            $this->bucket,
+            self::PATH_PREFIX.'/'.$sourceKey,
+            $this->bucket,
+            self::PATH_PREFIX.'/'.$key,
+            'private',
+            []
+        )->willThrow(S3Exception::class);
     }
 
     public function getMatchers()

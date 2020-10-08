@@ -415,19 +415,16 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     public function copy($path, $newpath)
     {
-        $command = $this->s3Client->getCommand(
-            'copyObject',
-            [
-                'Bucket'     => $this->bucket,
-                'Key'        => $this->applyPathPrefix($newpath),
-                'CopySource' => S3Client::encodeKey($this->bucket . '/' . $this->applyPathPrefix($path)),
-                'ACL'        => $this->getRawVisibility($path) === AdapterInterface::VISIBILITY_PUBLIC
-                    ? 'public-read' : 'private',
-            ] + $this->options
-        );
-
         try {
-            $this->s3Client->execute($command);
+            $this->s3Client->copy(
+                $this->bucket,
+                $this->applyPathPrefix($path),
+                $this->bucket,
+                $this->applyPathPrefix($newpath),
+                $this->getRawVisibility($path) === AdapterInterface::VISIBILITY_PUBLIC
+                    ? 'public-read' : 'private',
+                $this->options
+            );
         } catch (S3Exception $e) {
             return false;
         }
