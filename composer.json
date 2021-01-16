@@ -24,7 +24,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "League\\Flysystem\\AwsS3v3\\Stub\\": "stub"
+            "League\\Flysystem\\AwsS3v3\\Stub\\": "stub",
+            "spec\\League\\Flysystem\\AwsS3v3\\": "spec"
         }
     },
     "config": {
