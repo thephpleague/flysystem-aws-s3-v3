@@ -392,6 +392,8 @@ class AwsS3V3Adapter implements FilesystemAdapter
                 $exception
             );
         }
+        
+        $options = $this->createOptionsFromConfig($config);
 
         try {
             $this->client->copy(
@@ -400,7 +402,7 @@ class AwsS3V3Adapter implements FilesystemAdapter
                 $this->bucket,
                 $this->prefixer->prefixPath($destination),
                 $this->visibility->visibilityToAcl($visibility),
-                $this->options
+                $options
             );
         } catch (Throwable $exception) {
             throw UnableToCopyFile::fromLocationTo($source, $destination, $exception);
