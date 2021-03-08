@@ -6,7 +6,6 @@ use Aws\Result;
 use Aws\S3\Exception\DeleteMultipleObjectsException;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\Exception\S3MultipartUploadException;
-use Aws\S3\S3Client;
 use Aws\S3\S3ClientInterface;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Adapter\AbstractAdapter;
