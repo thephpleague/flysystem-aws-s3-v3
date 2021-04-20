@@ -681,7 +681,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             $this->bucket,
             self::PATH_PREFIX.'/'.$key,
             $acl,
-            []
+            ['params' => []]
         )->shouldBeCalled();
     }
 
@@ -705,7 +705,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             $this->bucket,
             self::PATH_PREFIX.'/'.$key,
             'private',
-            []
+            ['params' => []]
         )->willThrow(S3Exception::class);
     }
 
