@@ -601,14 +601,14 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
                 unset($options['ContentLength']);
             }
             
-            if (! isset($options['Content-MD5'])) {
+            if (! isset($options['ContentMD5'])) {
                 if (is_resource($body)) {
                     $ctx = hash_init('MD5');
                     hash_update_stream($ctx, $body);
                     rewind($body);
-                    $options['Content-MD5'] = base64_encode(hash_final($ctx, true));
+                    $options['ContentMD5'] = base64_encode(hash_final($ctx, true));
                 } else {
-                    $options['Content-MD5'] = base64_encode(md5($body, true));
+                    $options['ContentMD5'] = base64_encode(md5($body, true));
                 }
             }
         }
