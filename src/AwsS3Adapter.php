@@ -41,6 +41,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         'ContentDisposition',
         'ContentEncoding',
         'ContentLength',
+        'ContentMD5',
         'ContentType',
         'Expires',
         'GrantFullControl',
