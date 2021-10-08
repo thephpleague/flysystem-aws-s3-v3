@@ -535,7 +535,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     public function setPathPrefix($prefix)
     {
-        $prefix = ltrim($prefix, '/');
+        $prefix = ltrim((string) $prefix, '/');
 
         return parent::setPathPrefix($prefix);
     }
