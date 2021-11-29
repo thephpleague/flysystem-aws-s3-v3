@@ -1,4 +1,4 @@
-# League\Flysystem\AwsS3v3
+# League\Flysystem\AwsS3V3
 
 [![Author](http://img.shields.io/badge/author-@frankdejonge-blue.svg?style=flat-square)](https://twitter.com/frankdejonge)
 [![Build Status](https://img.shields.io/travis/thephpleague/flysystem-aws-s3-v3/master.svg?style=flat-square)](https://travis-ci.org/thephpleague/flysystem-aws-s3-v3)
@@ -23,7 +23,7 @@ Using standard `Aws\S3\S3Client`:
 ``` php
 <?php
 use Aws\S3\S3Client;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\Filesystem;
 
 include __DIR__ . '/vendor/autoload.php';
@@ -37,7 +37,7 @@ $client = new S3Client([
     'version' => 'latest|version',
 ]);
 
-$adapter = new AwsS3Adapter($client, 'your-bucket-name');
+$adapter = new AwsS3V3Adapter($client, 'your-bucket-name');
 $filesystem = new Filesystem($adapter);
 ```
 
@@ -46,7 +46,7 @@ or using `Aws\S3\S3MultiRegionClient` which does not require to specify the `reg
 ``` php
 <?php
 use Aws\S3\S3MultiRegionClient;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\Filesystem;
 
 include __DIR__ . '/vendor/autoload.php';
@@ -59,6 +59,6 @@ $client = new S3MultiRegionClient([
     'version' => 'latest|version',
 ]);
 
-$adapter = new AwsS3Adapter($client, 'your-bucket-name');
+$adapter = new AwsS3V3Adapter($client, 'your-bucket-name');
 $filesystem = new Filesystem($adapter);
 ```
