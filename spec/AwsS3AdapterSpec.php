@@ -194,7 +194,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         ]);
         $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key, [])->willReturn(false);
 
-        $this->client->getCommand('listObjects', [
+        $this->client->getCommand('ListObjectsV2', [
             'Bucket' => $this->bucket,
             'Prefix' => self::PATH_PREFIX.'/'.$key.'/',
             'MaxKeys' => 1,
@@ -213,7 +213,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $key = 'directory';
         $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key, [])->willReturn(false);
 
-        $this->client->getCommand('listObjects', [
+        $this->client->getCommand('ListObjectsV2', [
             'Bucket' => $this->bucket,
             'Prefix' => self::PATH_PREFIX.'/'.$key.'/',
             'MaxKeys' => 1,
@@ -237,7 +237,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $key = 'directory';
         $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key, [])->willReturn(false);
 
-        $this->client->getCommand('listObjects', [
+        $this->client->getCommand('ListObjectsV2', [
             'Bucket' => $this->bucket,
             'Prefix' => self::PATH_PREFIX.'/'.$key.'/',
             'MaxKeys' => 1,
@@ -336,7 +336,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
             ]
         ]);
 
-        $this->client->getPaginator('ListObjects', [
+        $this->client->getPaginator('ListObjectsV2', [
             'Bucket' => $this->bucket,
             'Prefix' => self::PATH_PREFIX.'/'.$prefix.'/',
             'Delimiter' => '/'
@@ -503,7 +503,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->make_it_read_a_file($command, 'read', '');
         $this->read($key)->shouldHaveKeyWithValue('path', $key);
 
-        $this->client->getPaginator('ListObjects', [
+        $this->client->getPaginator('ListObjectsV2', [
             'Bucket' => $this->bucket,
             'Prefix' => self::PATH_PREFIX.'/'.$dir.'/',
             'Delimiter' => '/'
@@ -735,7 +735,7 @@ class AwsS3AdapterSpec extends ObjectBehavior
         $this->client->doesObjectExist($this->bucket, self::PATH_PREFIX.'/'.$key, [])->willReturn(false);
 
         $result = new Result();
-        $this->client->getCommand('listObjects', [
+        $this->client->getCommand('ListObjectsV2', [
             'Bucket' => $this->bucket,
             'Prefix' => self::PATH_PREFIX.'/'.$key.'/',
             'MaxKeys' => 1,
