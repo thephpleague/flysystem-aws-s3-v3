@@ -287,7 +287,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     protected function retrievePaginatedListing(array $options)
     {
-        $resultPaginator = $this->s3Client->getPaginator('ListObjects', $options);
+        $resultPaginator = $this->s3Client->getPaginator('ListObjectsV2', $options);
         $listing = [];
 
         foreach ($resultPaginator as $result) {
@@ -700,7 +700,7 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
         // Maybe this isn't an actual key, but a prefix.
         // Do a prefix listing of objects to determine.
         $command = $this->s3Client->getCommand(
-            'listObjects',
+            'ListObjectsV2',
             [
                 'Bucket'  => $this->bucket,
                 'Prefix'  => rtrim($location, '/') . '/',
