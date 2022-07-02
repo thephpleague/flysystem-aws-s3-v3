@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.30 - 2022-07-02
+
+* upgrade to list objects v2
+
 ## 1.0.29 - 2020-10-08
 
 * copies now switch to multipart copy for large files.
