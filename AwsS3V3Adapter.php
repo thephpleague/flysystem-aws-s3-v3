@@ -221,15 +221,31 @@ class AwsS3V3Adapter implements FilesystemAdapter, PublicUrlGenerator, ChecksumP
         return $resource;
     }
 
-    public function delete(string $path): void
+    public function delete(string|array $paths): void
     {
-        $arguments = ['Bucket' => $this->bucket, 'Key' => $this->prefixer->prefixPath($path)];
-        $command = $this->client->getCommand('DeleteObject', $arguments);
+        $paths = is_array($paths) ? $paths : [$paths];
+
+        $deleteObjects = [];
+        
+        foreach ($paths as $path) {
+            $deleteObjects[] = [
+                'Key' => $this->prefixer->prefixPath($path),
+            ];
+        }
+
+        $arguments = [
+            'Bucket' => $this->bucket,
+            'Delete' => [
+                'Objects' => $deleteObjects,
+            ],
+        ];
+
+        $command = $this->client->getCommand('DeleteObjects', $arguments);
 
         try {
             $this->client->execute($command);
         } catch (Throwable $exception) {
-            throw UnableToDeleteFile::atLocation($path, '', $exception);
+            throw UnableToDeleteFile::atLocation(implode(', ', $paths), '', $exception);
         }
     }
 
